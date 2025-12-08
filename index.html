@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campus e-Library | Home</title>
+    
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="index.html" class="logo">Campus e-Library</a>
+        <div class="nav-links">
+            <a href="index.html" class="active">Home</a>
+            <a href="library.html">Browse</a>
+            <a href="upload.html" class="btn-upload">Upload</a>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Smarter Studying Starts <span class="highlight">Here.</span></h1>
+            <p>Access curated lecture notes, handouts, and past questions for FUTA students. Fast, free, and organized.</p>
+            
+            <div class="search-container">
+                <form id="homeSearchForm">
+                    <input type="text" id="homeSearchInput" class="search-input" placeholder="Search for a course (e.g. MTS 101)..." required>
+                    <button type="submit" class="search-btn">Search</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <section class="features">
+        <div class="section-title">Quick Access by Level</div>
+        
+        <div class="grid">
+            <div class="card" onclick="goToLibrary('100')">
+                <span class="card-icon">🌱</span>
+                <div class="card-title">100 Level</div>
+                <div class="card-desc">Freshman Essentials</div>
+            </div>
+
+            <div class="card" onclick="goToLibrary('200')">
+                <span class="card-icon">🚀</span>
+                <div class="card-title">200 Level</div>
+                <div class="card-desc">Core Foundations</div>
+            </div>
+
+            <div class="card" onclick="goToLibrary('300')">
+                <span class="card-icon">⚙️</span>
+                <div class="card-title">300 Level</div>
+                <div class="card-desc">Advanced Theory</div>
+            </div>
+
+            <div class="card" onclick="goToLibrary('400')">
+                <span class="card-icon">🎓</span>
+                <div class="card-title">400/500 Level</div>
+                <div class="card-desc">Final Year Projects</div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2025 Campus e-Library. Built for Students.</p>
+    </footer>
+
+    <script src="index.js"></script>
+
+</body>
+</html>
