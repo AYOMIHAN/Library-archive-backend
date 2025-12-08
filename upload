@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FUTA Study Archive - Smart Batch</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        /* --- VANILLA CSS --- */
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+            margin: 0;
+        }
+
+        .container {
+            background: white;
+            width: 100%;
+            max-width: 700px;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        h2 { text-align: center; color: #333; margin-top: 0; }
+        p.subtitle { text-align: center; color: #666; font-size: 0.9rem; margin-bottom: 20px; }
+
+        /* Shared Details Box */
+        .batch-details-box {
+            background-color: #eef2ff;
+            border: 1px solid #e0e7ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .batch-title {
+            color: #3730a3;
+            font-weight: bold;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        input[type="text"], select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 1rem;
+        }
+
+        .row { display: flex; gap: 10px; }
+        .col { flex: 1; }
+
+        label { font-weight: bold; font-size: 0.9rem; display: block; margin-bottom: 5px; }
+
+        /* The File List Area */
+        #fileListArea {
+            margin-top: 20px;
+            border-top: 1px solid #eee;
+            padding-top: 15px;
+            display: none; /* Hidden until files are selected */
+        }
+
+        .file-row {
+            display: flex;
+            flex-direction: column;
+            background: #fff;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            transition: all 0.2s;
+        }
+
+        .file-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        /* The input for individual titles */
+        .file-title-input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc; /* Blue border to show it is editable */
+            border-radius: 4px;
+            font-size: 0.95rem;
+        }
+
+        /* Button Styles */
+        button#submitBtn {
+            width: 100%;
+            padding: 14px;
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            display: none; /* Hidden until files selected */
+        }
+        button#submitBtn:hover { background-color: #1d4ed8; }
+        button#submitBtn:disabled { background-color: #93c5fd; cursor: not-allowed; }
+
+        /* Status Colors */
+        .status-success { border-color: #22c55e; background-color: #f0fdf4; }
+        .status-error { border-color: #ef4444; background-color: #fef2f2; }
+        
+        .status-msg { font-weight: bold; font-size: 0.85rem; margin-top: 5px; display: block; }
+        .msg-waiting { color: #666; display: none; }
+        .msg-success { color: #16a34a; }
+        .msg-error { color: #dc2626; }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Batch Upload & Edit</h2>
+        <p class="subtitle">Select files -> Rename Titles -> Upload</p>
+
+        <div class="batch-details-box">
+            <div class="batch-title">Common Details (Applied to all)</div>
+            
+            <input type="text" id="course_code" placeholder="Course Code (e.g. MTS 101)">
+            <input type="text" id="owner_dept" placeholder="Owner Dept (e.g. IDD)">
+
+            <div class="row">
+                <div class="col">
+                    <select id="level">
+                        <option value="100">100 L</option>
+                        <option value="200">200 L</option>
+                        <option value="300">300 L</option>
+                        <option value="400">400 L</option>
+                        <option value="500">500 L</option>
+                    </select>
+                </div>
+                <div class="col">
+                    <select id="semester">
+                        <option value="1">1st Semester</option>
+                        <option value="2">2nd Semester</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 10px; text-align: center;">
+            <label for="fileInput" style="cursor: pointer; display: inline-block; background: #eee; padding: 10px 20px; border-radius: 5px;">
+                📂 Click to Select Files...
+            </label>
+            <input type="file" id="fileInput" accept="application/pdf" multiple style="display: none;" onchange="handleFileSelect()">
+        </div>
+
+        <div id="fileListArea">
+            <div class="batch-title">Review Titles</div>
+            <div id="cardsContainer"></div>
+        </div>
+
+        <button type="button" onclick="startBatchUpload()" id="submitBtn">
+            🚀 Upload All Files
+        </button>
+
+    </div>
+
+    <script>
+        // --- YOUR KEYS ---
+        const SUPABASE_URL = "https://tfjxfmjcmynwwhslzvdy.supabase.co"; 
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRmanhmbWpjbXlud3doc2x6dmR5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUxOTExNzEsImV4cCI6MjA4MDc2NzE3MX0.9T3c3b18rczwWTYKE8387PfIqueKzA4rkbLR4TYYxcc"; 
+        const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // Global variable to store selected files
+        let selectedFiles = [];
+
+        // 1. Handle Selection & Generate Cards
+        function handleFileSelect() {
+            const input = document.getElementById('fileInput');
+            const container = document.getElementById('cardsContainer');
+            const area = document.getElementById('fileListArea');
+            const btn = document.getElementById('submitBtn');
+
+            if (input.files.length > 0) {
+                selectedFiles = Array.from(input.files); // Convert to array
+                container.innerHTML = ""; // Clear previous
+                area.style.display = "block";
+                btn.style.display = "block";
+
+                selectedFiles.forEach((file, index) => {
+                    // Create a "Clean" title from filename
+                    let cleanName = file.name.replace('.pdf', '').replace(/[-_]/g, ' ');
+
+                    const html = `
+                        <div class="file-row" id="card-${index}">
+                            <div class="file-info">
+                                <span>📄 ${file.name}</span>
+                                <span>${(file.size / 1024 / 1024).toFixed(1)} MB</span>
+                            </div>
+                            <input type="text" class="file-title-input" id="title-${index}" value="${cleanName}" placeholder="Enter Title...">
+                            <span class="status-msg" id="status-${index}"></span>
+                        </div>
+                    `;
+                    container.insertAdjacentHTML('beforeend', html);
+                });
+            }
+        }
+
+        // 2. Main Upload Logic
+        async function startBatchUpload() {
+            const btn = document.getElementById('submitBtn');
+            
+            // Common Data Validation
+            const commonData = {
+                course_code: document.getElementById('course_code').value.toUpperCase().trim(),
+                owner_dept: document.getElementById('owner_dept').value.toUpperCase().trim(),
+                level: parseInt(document.getElementById('level').value),
+                semester: document.getElementById('semester').value,
+            };
+
+            if(!commonData.course_code || !commonData.owner_dept) {
+                alert("Please fill in Course Code and Department.");
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerText = "Processing...";
+
+            // Loop through the stored files
+            for (let i = 0; i < selectedFiles.length; i++) {
+                const file = selectedFiles[i];
+                const customTitle = document.getElementById(`title-${i}`).value.trim(); // Get the custom title
+                
+                // If user deleted the title, fallback to filename
+                const finalTitle = customTitle || file.name.replace('.pdf', '');
+
+                await uploadSingleFile(file, commonData, finalTitle, i);
+            }
+
+            btn.disabled = false;
+            btn.innerText = "✅ Batch Complete (Select more?)";
+        }
+
+        async function uploadSingleFile(file, commonData, title, index) {
+            const card = document.getElementById(`card-${index}`);
+            const statusMsg = document.getElementById(`status-${index}`);
+            const titleInput = document.getElementById(`title-${index}`);
+
+            try {
+                // Update UI to "Loading"
+                statusMsg.innerText = "⏳ Uploading...";
+                statusMsg.className = "status-msg msg-waiting";
+                statusMsg.style.display = "block";
+                titleInput.disabled = true; // Lock input
+
+                // Size Check
+                if (file.size > 20 * 1024 * 1024) throw new Error("File too large (>20MB)");
+
+                // A. Generate Filename
+                const safeName = commonData.course_code.replace(/[^a-z0-9]/gi, '');
+                const fileExt = file.name.split('.').pop();
+                const uniqueId = Math.random().toString(36).substring(7);
+                const fileName = `${commonData.owner_dept}/${commonData.level}/${safeName}_${uniqueId}.${fileExt}`;
+
+                // B. Get URL
+                const response = await fetch('/.netlify/functions/api', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'upload', file_key: fileName, file_type: file.type })
+                });
+
+                if (!response.ok) throw new Error("Backend Error");
+                const data = await response.json();
+
+                // C. Upload to Cloudflare
+                await fetch(data.url, {
+                    method: 'PUT',
+                    body: file,
+                    headers: { 'Content-Type': file.type }
+                });
+
+                // D. Save to DB
+                const { error } = await db.from('study_materials').insert([{
+                    ...commonData,
+                    title: title,
+                    visible_to: [commonData.owner_dept],
+                    file_key: fileName,
+                    file_size: (file.size / 1024 / 1024).toFixed(2) + " MB"
+                }]);
+
+                if (error) throw error;
+
+                // Success
+                card.classList.add('status-success');
+                statusMsg.innerText = "✅ Uploaded Successfully";
+                statusMsg.className = "status-msg msg-success";
+
+            } catch (err) {
+                // Error
+                console.error(err);
+                card.classList.add('status-error');
+                statusMsg.innerText = "❌ " + err.message;
+                statusMsg.className = "status-msg msg-error";
+            }
+        }
+    </script>
+</body>
+</html>
