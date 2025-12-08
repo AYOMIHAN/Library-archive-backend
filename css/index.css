@@ -1,0 +1,197 @@
+/* --- GLOBAL VARIABLES --- */
+:root {
+    --primary: #4f46e5;      /* Indigo Blue */
+    --primary-dark: #4338ca; /* Darker Blue for hover */
+    --text-dark: #1f2937;    /* Dark Grey for text */
+    --text-gray: #6b7280;    /* Light Grey for subtitles */
+    --bg-light: #f3f4f6;     /* Page Background */
+    --white: #ffffff;
+}
+
+/* --- RESET & BASIC SETUP --- */
+body {
+    font-family: system-ui, -apple-system, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: var(--bg-light);
+    color: var(--text-dark);
+    line-height: 1.6;
+}
+
+a { text-decoration: none; color: inherit; }
+
+/* --- NAVIGATION BAR --- */
+.navbar {
+    background: var(--white);
+    padding: 1rem 5%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    position: sticky; /* Keeps nav at top when scrolling */
+    top: 0;
+    z-index: 100;
+}
+
+.logo {
+    font-weight: 800;
+    font-size: 1.5rem;
+    color: var(--primary);
+    letter-spacing: -0.5px;
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+}
+
+.nav-links a {
+    margin-left: 20px;
+    font-weight: 500;
+    font-size: 0.95rem;
+    color: var(--text-gray);
+    transition: color 0.2s;
+}
+
+.nav-links a:hover, .nav-links a.active {
+    color: var(--primary);
+}
+
+/* The Upload Button Style */
+.nav-links .btn-upload {
+    background-color: var(--text-dark);
+    color: var(--white);
+    padding: 8px 16px;
+    border-radius: 6px;
+    transition: background 0.2s;
+}
+.nav-links .btn-upload:hover {
+    background-color: black;
+}
+
+/* --- HERO SECTION (Search & Intro) --- */
+.hero {
+    background: var(--white);
+    text-align: center;
+    padding: 5rem 1rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.hero h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: var(--text-dark);
+}
+
+.hero .highlight { color: var(--primary); }
+
+.hero p {
+    font-size: 1.1rem;
+    color: var(--text-gray);
+    max-width: 600px;
+    margin: 0 auto 2.5rem auto;
+}
+
+/* --- SEARCH BAR STYLING --- */
+.search-container {
+    max-width: 600px;
+    margin: 0 auto;
+    position: relative;
+}
+
+.search-input {
+    width: 100%;
+    padding: 18px 25px;
+    font-size: 1.1rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 50px;
+    outline: none;
+    transition: all 0.3s;
+    box-sizing: border-box;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+.search-input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+}
+
+.search-btn {
+    position: absolute;
+    right: 8px;
+    top: 8px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 30px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background 0.2s;
+}
+
+.search-btn:hover { background: var(--primary-dark); }
+
+/* --- QUICK ACCESS GRID --- */
+.features {
+    padding: 3rem 5%;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.section-title {
+    text-align: center;
+    margin-bottom: 2rem;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text-gray);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+/* --- CARD DESIGN --- */
+.card {
+    background: var(--white);
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    text-align: center;
+    border: 1px solid #e5e7eb;
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+    border-color: var(--primary);
+}
+
+.card-icon { font-size: 2rem; margin-bottom: 10px; display: block; }
+.card-title { font-weight: bold; color: var(--text-dark); margin-bottom: 5px; }
+.card-desc { font-size: 0.9rem; color: var(--text-gray); }
+
+/* --- FOOTER --- */
+footer {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-gray);
+    font-size: 0.9rem;
+    margin-top: 2rem;
+}
+
+/* --- MOBILE RESPONSIVENESS --- */
+@media (max-width: 600px) {
+    .hero h1 { font-size: 2rem; }
+    .navbar { padding: 1rem; }
+    
+    /* Hide the text links on very small screens, keep logo and upload */
+    .nav-links a:not(.btn-upload) { display: none; }
+}
