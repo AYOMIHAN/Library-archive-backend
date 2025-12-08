@@ -150,8 +150,8 @@
                 </div>
                 <div class="col">
                     <select id="semester">
-                        <option value="1">Harmattan</option>
-                        <option value="2">Rain</option>
+                        <option value="1">1st Semester</option>
+                        <option value="2">2nd Semester</option>
                     </select>
                 </div>
             </div>
@@ -199,7 +199,6 @@
 
                 selectedFiles.forEach((file, index) => {
                     // Create a "Clean" title from filename
-                    // Remove .pdf and replace underscores/hyphens with spaces
                     let cleanName = file.name.replace('.pdf', '').replace(/[-_]/g, ' ');
 
                     const html = `
@@ -290,10 +289,10 @@
                     headers: { 'Content-Type': file.type }
                 });
 
-                // D. Save to DB (USING THE CUSTOM TITLE)
+                // D. Save to DB
                 const { error } = await db.from('study_materials').insert([{
                     ...commonData,
-                    title: title, // <--- Using the editable title here
+                    title: title,
                     visible_to: [commonData.owner_dept],
                     file_key: fileName,
                     file_size: (file.size / 1024 / 1024).toFixed(2) + " MB"
