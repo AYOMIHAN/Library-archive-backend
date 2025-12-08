@@ -3,155 +3,276 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FUTA Study Archive</title>
+    <title>FUTA Study Archive - Batch Upload</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+        /* --- VANILLA CSS STYLES --- */
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+            margin: 0;
+        }
+
+        .container {
+            background: white;
+            width: 100%;
+            max-width: 600px; /* Slightly wider for the list */
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        h2 { text-align: center; color: #333; margin-top: 0; }
+        p.subtitle { text-align: center; color: #666; font-size: 0.9rem; margin-bottom: 20px; }
+
+        /* The Box for Shared Details */
+        .batch-details-box {
+            background-color: #eef2ff; /* Light Blue background */
+            border: 1px solid #e0e7ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .batch-title {
+            color: #3730a3; /* Dark Blue */
+            font-weight: bold;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box; /* Keeps padding inside */
+            font-size: 1rem;
+        }
+
+        /* Layout for Level/Semester side-by-side */
+        .row { display: flex; gap: 10px; }
+        .col { flex: 1; }
+
+        label { font-weight: bold; font-size: 0.9rem; display: block; margin-bottom: 5px; }
+
+        /* The Main Action Button */
+        button#submitBtn {
+            width: 100%;
+            padding: 14px;
+            background-color: #2563eb; /* Blue */
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background 0.2s;
+        }
+        button#submitBtn:hover { background-color: #1d4ed8; }
+        button#submitBtn:disabled { background-color: #93c5fd; cursor: not-allowed; }
+
+        /* Progress List Styles */
+        #progressArea { margin-top: 20px; border-top: 1px solid #eee; padding-top: 10px; }
+        
+        .file-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fff;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        /* Status Colors */
+        .status-waiting { color: #666; font-weight: bold; }
+        .status-uploading { color: #2563eb; font-weight: bold; }
+        .status-success { 
+            background-color: #f0fdf4; 
+            border-color: #bbf7d0; 
+            color: #16a34a; /* Green */
+        }
+        .status-error { 
+            background-color: #fef2f2; 
+            border-color: #fecaca; 
+            color: #dc2626; /* Red */
+        }
+
+    </style>
 </head>
-<body class="bg-gray-100 min-h-screen p-4">
+<body>
 
-    <div class="max-w-md mx-auto bg-white rounded-xl shadow-lg p-6 mt-10">
-        <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Upload Material</h2>
+    <div class="container">
+        <h2>Batch Upload Material</h2>
+        <p class="subtitle">Select multiple files (PDF) to upload at once.</p>
 
-        <div class="space-y-4">
+        <div class="batch-details-box">
+            <div class="batch-title">Batch Settings (Applied to all files)</div>
             
-            <input type="text" id="course_code" placeholder="Course Code (e.g. MTS 101)" 
-                   class="w-full p-3 border rounded bg-gray-50">
+            <input type="text" id="course_code" placeholder="Course Code (e.g. MTS 101)">
+            <input type="text" id="owner_dept" placeholder="Owner Dept (e.g. IDD)">
 
-            <input type="text" id="title" placeholder="File Title (e.g. Algebra)" 
-                   class="w-full p-3 border rounded bg-gray-50">
-
-            <input type="text" id="owner_dept" placeholder="Owner Dept (e.g. IDD)" 
-                   class="w-full p-3 border rounded bg-gray-50">
-
-            <div class="grid grid-cols-2 gap-2">
-                <select id="level" class="p-3 border rounded bg-gray-50">
-                    <option value="100">100 L</option>
-                    <option value="200">200 L</option>
-                    <option value="300">300 L</option>
-                    <option value="400">400 L</option>
-                    <option value="500">500 L</option>
-                </select>
-                <select id="semester" class="p-3 border rounded bg-gray-50">
-                    <option value="1">Harmattan</option>
-                    <option value="2">Rain</option>
-                </select>
+            <div class="row">
+                <div class="col">
+                    <select id="level">
+                        <option value="100">100 L</option>
+                        <option value="200">200 L</option>
+                        <option value="300">300 L</option>
+                        <option value="400">400 L</option>
+                        <option value="500">500 L</option>
+                    </select>
+                </div>
+                <div class="col">
+                    <select id="semester">
+                        <option value="1">Harmattan</option>
+                        <option value="2">Rain</option>
+                    </select>
+                </div>
             </div>
-
-            <input type="file" id="fileInput" accept="application/pdf" 
-                   class="w-full p-2 border rounded">
-
-            <button type="button" onclick="startUpload()" id="submitBtn"
-                    class="w-full bg-blue-600 text-white font-bold p-3 rounded hover:bg-blue-700">
-                🚀 Upload Material
-            </button>
-            
-            <div id="status" class="text-center font-bold text-sm mt-4 min-h-[20px]"></div>
         </div>
+
+        <div style="margin-bottom: 10px;">
+            <label>Select Files (Max 20MB each)</label>
+            <input type="file" id="fileInput" accept="application/pdf" multiple>
+        </div>
+
+        <button type="button" onclick="startBatchUpload()" id="submitBtn">
+            🚀 Start Batch Upload
+        </button>
+        
+        <div id="progressArea"></div>
+
     </div>
 
     <script>
-        // 1. SETUP KEYS
+        // --- YOUR KEYS ---
         const SUPABASE_URL = "https://tfjxfmjcmynwwhslzvdy.supabase.co"; 
         const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRmanhmbWpjbXlud3doc2x6dmR5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUxOTExNzEsImV4cCI6MjA4MDc2NzE3MX0.9T3c3b18rczwWTYKE8387PfIqueKzA4rkbLR4TYYxcc"; 
-        
-        // --- FIX IS HERE: Named it 'db' instead of 'supabase' ---
         const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // 2. MAIN UPLOAD FUNCTION
-        async function startUpload() {
-            const status = document.getElementById('status');
+        async function startBatchUpload() {
+            const fileInput = document.getElementById('fileInput');
+            const files = fileInput.files;
             const btn = document.getElementById('submitBtn');
-            const file = document.getElementById('fileInput').files[0];
+            const progressArea = document.getElementById('progressArea');
 
-            if (!file) {
-                status.innerText = "⚠️ Please select a file first!";
-                status.style.color = "red";
+            // 1. Validation
+            if (files.length === 0) {
+                alert("Please select at least one file!");
+                return;
+            }
+            
+            const commonData = {
+                course_code: document.getElementById('course_code').value.toUpperCase().trim(),
+                owner_dept: document.getElementById('owner_dept').value.toUpperCase().trim(),
+                level: parseInt(document.getElementById('level').value),
+                semester: document.getElementById('semester').value,
+            };
+
+            if(!commonData.course_code || !commonData.owner_dept) {
+                alert("Please fill in Course Code and Department.");
                 return;
             }
 
+            // 2. Prepare UI
             btn.disabled = true;
-            btn.innerText = "Wait...";
+            btn.innerText = `Uploading ${files.length} files...`;
+            progressArea.innerHTML = ""; // Clear old list
+
+            // 3. Loop through files
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                
+                // Create a Status Card HTML
+                const cardId = `file-${i}`;
+                const cardHTML = `
+                    <div id="${cardId}" class="file-card">
+                        <span>${file.name}</span>
+                        <span class="status-text status-waiting">⏳ Pending...</span>
+                    </div>
+                `;
+                // Add to the list
+                progressArea.insertAdjacentHTML('beforeend', cardHTML);
+                
+                // Run upload function
+                await uploadSingleFile(file, commonData, cardId);
+            }
+
+            // Finished
+            btn.disabled = false;
+            btn.innerText = "🚀 Start Batch Upload";
+        }
+
+        async function uploadSingleFile(file, commonData, cardId) {
+            const card = document.getElementById(cardId);
+            const statusText = card.querySelector('.status-text');
 
             try {
-                // A. GATHER DATA
-                status.innerText = "⏳ Preparing...";
-                status.style.color = "gray";
+                // Update Status to Blue
+                statusText.innerText = "☁️ Uploading...";
+                statusText.className = "status-text status-uploading";
 
-                const metadata = {
-                    course_code: document.getElementById('course_code').value.toUpperCase().trim(),
-                    title: document.getElementById('title').value.trim(),
-                    owner_dept: document.getElementById('owner_dept').value.toUpperCase().trim(),
-                    level: parseInt(document.getElementById('level').value),
-                    semester: document.getElementById('semester').value,
-                };
-                
-                if(!metadata.course_code || !metadata.title || !metadata.owner_dept) {
-                    throw new Error("Please fill in all text fields.");
+                // Check Size (20MB Limit)
+                if (file.size > 20 * 1024 * 1024) {
+                    throw new Error("File too large (>20MB)");
                 }
 
-                // B. GENERATE SECURE URL
+                // A. Generate Unique Name
+                // We use the original filename as the Title for batch uploads
+                const safeName = commonData.course_code.replace(/[^a-z0-9]/gi, '');
                 const fileExt = file.name.split('.').pop();
-                const safeName = metadata.course_code.replace(/[^a-z0-9]/gi, '');
-                const fileName = `${metadata.owner_dept}/${metadata.level}/${safeName}_${Date.now()}.${fileExt}`;
+                const uniqueId = Math.random().toString(36).substring(7);
+                const fileName = `${commonData.owner_dept}/${commonData.level}/${safeName}_${uniqueId}.${fileExt}`;
 
-                // Call Netlify Backend
+                // B. Get URL from Netlify
                 const response = await fetch('/.netlify/functions/api', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        action: 'upload', 
-                        file_key: fileName, 
-                        file_type: file.type 
-                    })
+                    body: JSON.stringify({ action: 'upload', file_key: fileName, file_type: file.type })
                 });
 
-                if (!response.ok) {
-                    const errText = await response.text();
-                    throw new Error("Backend connection failed: " + errText);
-                }
-
+                if (!response.ok) throw new Error("Backend Error");
                 const data = await response.json();
-                if (!data.url) throw new Error("No URL returned from backend.");
 
-                // C. UPLOAD TO CLOUDFLARE
-                status.innerText = "☁️ Uploading file...";
+                // C. Upload to Cloudflare
                 await fetch(data.url, {
                     method: 'PUT',
                     body: file,
                     headers: { 'Content-Type': file.type }
                 });
 
-                // D. SAVE TO DATABASE (Using 'db' now)
-                status.innerText = "💾 Saving info...";
+                // D. Save to DB
                 const { error } = await db.from('study_materials').insert([{
-                    ...metadata,
-                    visible_to: [metadata.owner_dept],
+                    ...commonData,
+                    title: file.name.replace('.pdf', ''), // Use filename as title
+                    visible_to: [commonData.owner_dept],
                     file_key: fileName,
                     file_size: (file.size / 1024 / 1024).toFixed(2) + " MB"
                 }]);
 
                 if (error) throw error;
 
-                // E. SUCCESS
-                status.innerText = "✅ Upload Successful!";
-                status.style.color = "green";
-                btn.innerText = "Done";
-                
-                // Clear form
-                setTimeout(() => {
-                    status.innerText = "";
-                    btn.innerText = "🚀 Upload Material";
-                    document.getElementById('title').value = "";
-                    document.getElementById('course_code').value = "";
-                }, 3000);
+                // Success State (Green)
+                card.classList.add('status-success'); // Adds green background
+                statusText.innerText = "✅ Done";
+                statusText.className = "status-text"; // Reset text color to inherit from parent
 
             } catch (err) {
+                // Error State (Red)
                 console.error(err);
-                status.innerText = "❌ Error: " + err.message;
-                status.style.color = "red";
-                btn.innerText = "Try Again";
-            } finally {
-                btn.disabled = false;
+                card.classList.add('status-error'); // Adds red background
+                statusText.innerText = "❌ " + err.message;
+                statusText.className = "status-text";
             }
         }
     </script>
