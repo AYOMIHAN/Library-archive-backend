@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FUTA Study Archive - Batch Upload</title>
+    <title>FUTA Study Archive - Smart Batch</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <style>
-        /* --- VANILLA CSS STYLES --- */
+        /* --- VANILLA CSS --- */
         body {
             font-family: system-ui, -apple-system, sans-serif;
             background-color: #f4f4f9;
@@ -20,7 +20,7 @@
         .container {
             background: white;
             width: 100%;
-            max-width: 600px; /* Slightly wider for the list */
+            max-width: 700px;
             padding: 2rem;
             border-radius: 12px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
@@ -29,9 +29,9 @@
         h2 { text-align: center; color: #333; margin-top: 0; }
         p.subtitle { text-align: center; color: #666; font-size: 0.9rem; margin-bottom: 20px; }
 
-        /* The Box for Shared Details */
+        /* Shared Details Box */
         .batch-details-box {
-            background-color: #eef2ff; /* Light Blue background */
+            background-color: #eef2ff;
             border: 1px solid #e0e7ff;
             padding: 15px;
             border-radius: 8px;
@@ -39,34 +39,70 @@
         }
 
         .batch-title {
-            color: #3730a3; /* Dark Blue */
+            color: #3730a3;
             font-weight: bold;
             font-size: 0.85rem;
             text-transform: uppercase;
             margin-bottom: 10px;
         }
 
-        input, select {
+        input[type="text"], select {
             width: 100%;
             padding: 10px;
             margin-bottom: 10px;
             border: 1px solid #ccc;
             border-radius: 6px;
-            box-sizing: border-box; /* Keeps padding inside */
+            box-sizing: border-box;
             font-size: 1rem;
         }
 
-        /* Layout for Level/Semester side-by-side */
         .row { display: flex; gap: 10px; }
         .col { flex: 1; }
 
         label { font-weight: bold; font-size: 0.9rem; display: block; margin-bottom: 5px; }
 
-        /* The Main Action Button */
+        /* The File List Area */
+        #fileListArea {
+            margin-top: 20px;
+            border-top: 1px solid #eee;
+            padding-top: 15px;
+            display: none; /* Hidden until files are selected */
+        }
+
+        .file-row {
+            display: flex;
+            flex-direction: column;
+            background: #fff;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            transition: all 0.2s;
+        }
+
+        .file-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        /* The input for individual titles */
+        .file-title-input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc; /* Blue border to show it is editable */
+            border-radius: 4px;
+            font-size: 0.95rem;
+        }
+
+        /* Button Styles */
         button#submitBtn {
             width: 100%;
             padding: 14px;
-            background-color: #2563eb; /* Blue */
+            background-color: #2563eb;
             color: white;
             border: none;
             border-radius: 6px;
@@ -74,50 +110,30 @@
             font-weight: bold;
             cursor: pointer;
             margin-top: 10px;
-            transition: background 0.2s;
+            display: none; /* Hidden until files selected */
         }
         button#submitBtn:hover { background-color: #1d4ed8; }
         button#submitBtn:disabled { background-color: #93c5fd; cursor: not-allowed; }
 
-        /* Progress List Styles */
-        #progressArea { margin-top: 20px; border-top: 1px solid #eee; padding-top: 10px; }
-        
-        .file-card {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: #fff;
-            border: 1px solid #ddd;
-            padding: 10px;
-            border-radius: 6px;
-            margin-bottom: 8px;
-            font-size: 0.9rem;
-        }
-
         /* Status Colors */
-        .status-waiting { color: #666; font-weight: bold; }
-        .status-uploading { color: #2563eb; font-weight: bold; }
-        .status-success { 
-            background-color: #f0fdf4; 
-            border-color: #bbf7d0; 
-            color: #16a34a; /* Green */
-        }
-        .status-error { 
-            background-color: #fef2f2; 
-            border-color: #fecaca; 
-            color: #dc2626; /* Red */
-        }
+        .status-success { border-color: #22c55e; background-color: #f0fdf4; }
+        .status-error { border-color: #ef4444; background-color: #fef2f2; }
+        
+        .status-msg { font-weight: bold; font-size: 0.85rem; margin-top: 5px; display: block; }
+        .msg-waiting { color: #666; display: none; }
+        .msg-success { color: #16a34a; }
+        .msg-error { color: #dc2626; }
 
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h2>Batch Upload Material</h2>
-        <p class="subtitle">Select multiple files (PDF) to upload at once.</p>
+        <h2>Batch Upload & Edit</h2>
+        <p class="subtitle">Select files -> Rename Titles -> Upload</p>
 
         <div class="batch-details-box">
-            <div class="batch-title">Batch Settings (Applied to all files)</div>
+            <div class="batch-title">Common Details (Applied to all)</div>
             
             <input type="text" id="course_code" placeholder="Course Code (e.g. MTS 101)">
             <input type="text" id="owner_dept" placeholder="Owner Dept (e.g. IDD)">
@@ -141,16 +157,21 @@
             </div>
         </div>
 
-        <div style="margin-bottom: 10px;">
-            <label>Select Files (Max 20MB each)</label>
-            <input type="file" id="fileInput" accept="application/pdf" multiple>
+        <div style="margin-bottom: 10px; text-align: center;">
+            <label for="fileInput" style="cursor: pointer; display: inline-block; background: #eee; padding: 10px 20px; border-radius: 5px;">
+                📂 Click to Select Files...
+            </label>
+            <input type="file" id="fileInput" accept="application/pdf" multiple style="display: none;" onchange="handleFileSelect()">
+        </div>
+
+        <div id="fileListArea">
+            <div class="batch-title">Review Titles</div>
+            <div id="cardsContainer"></div>
         </div>
 
         <button type="button" onclick="startBatchUpload()" id="submitBtn">
-            🚀 Start Batch Upload
+            🚀 Upload All Files
         </button>
-        
-        <div id="progressArea"></div>
 
     </div>
 
@@ -160,18 +181,47 @@
         const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRmanhmbWpjbXlud3doc2x6dmR5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUxOTExNzEsImV4cCI6MjA4MDc2NzE3MX0.9T3c3b18rczwWTYKE8387PfIqueKzA4rkbLR4TYYxcc"; 
         const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        async function startBatchUpload() {
-            const fileInput = document.getElementById('fileInput');
-            const files = fileInput.files;
-            const btn = document.getElementById('submitBtn');
-            const progressArea = document.getElementById('progressArea');
+        // Global variable to store selected files
+        let selectedFiles = [];
 
-            // 1. Validation
-            if (files.length === 0) {
-                alert("Please select at least one file!");
-                return;
+        // 1. Handle Selection & Generate Cards
+        function handleFileSelect() {
+            const input = document.getElementById('fileInput');
+            const container = document.getElementById('cardsContainer');
+            const area = document.getElementById('fileListArea');
+            const btn = document.getElementById('submitBtn');
+
+            if (input.files.length > 0) {
+                selectedFiles = Array.from(input.files); // Convert to array
+                container.innerHTML = ""; // Clear previous
+                area.style.display = "block";
+                btn.style.display = "block";
+
+                selectedFiles.forEach((file, index) => {
+                    // Create a "Clean" title from filename
+                    // Remove .pdf and replace underscores/hyphens with spaces
+                    let cleanName = file.name.replace('.pdf', '').replace(/[-_]/g, ' ');
+
+                    const html = `
+                        <div class="file-row" id="card-${index}">
+                            <div class="file-info">
+                                <span>📄 ${file.name}</span>
+                                <span>${(file.size / 1024 / 1024).toFixed(1)} MB</span>
+                            </div>
+                            <input type="text" class="file-title-input" id="title-${index}" value="${cleanName}" placeholder="Enter Title...">
+                            <span class="status-msg" id="status-${index}"></span>
+                        </div>
+                    `;
+                    container.insertAdjacentHTML('beforeend', html);
+                });
             }
+        }
+
+        // 2. Main Upload Logic
+        async function startBatchUpload() {
+            const btn = document.getElementById('submitBtn');
             
+            // Common Data Validation
             const commonData = {
                 course_code: document.getElementById('course_code').value.toUpperCase().trim(),
                 owner_dept: document.getElementById('owner_dept').value.toUpperCase().trim(),
@@ -184,57 +234,46 @@
                 return;
             }
 
-            // 2. Prepare UI
             btn.disabled = true;
-            btn.innerText = `Uploading ${files.length} files...`;
-            progressArea.innerHTML = ""; // Clear old list
+            btn.innerText = "Processing...";
 
-            // 3. Loop through files
-            for (let i = 0; i < files.length; i++) {
-                const file = files[i];
+            // Loop through the stored files
+            for (let i = 0; i < selectedFiles.length; i++) {
+                const file = selectedFiles[i];
+                const customTitle = document.getElementById(`title-${i}`).value.trim(); // Get the custom title
                 
-                // Create a Status Card HTML
-                const cardId = `file-${i}`;
-                const cardHTML = `
-                    <div id="${cardId}" class="file-card">
-                        <span>${file.name}</span>
-                        <span class="status-text status-waiting">⏳ Pending...</span>
-                    </div>
-                `;
-                // Add to the list
-                progressArea.insertAdjacentHTML('beforeend', cardHTML);
-                
-                // Run upload function
-                await uploadSingleFile(file, commonData, cardId);
+                // If user deleted the title, fallback to filename
+                const finalTitle = customTitle || file.name.replace('.pdf', '');
+
+                await uploadSingleFile(file, commonData, finalTitle, i);
             }
 
-            // Finished
             btn.disabled = false;
-            btn.innerText = "🚀 Start Batch Upload";
+            btn.innerText = "✅ Batch Complete (Select more?)";
         }
 
-        async function uploadSingleFile(file, commonData, cardId) {
-            const card = document.getElementById(cardId);
-            const statusText = card.querySelector('.status-text');
+        async function uploadSingleFile(file, commonData, title, index) {
+            const card = document.getElementById(`card-${index}`);
+            const statusMsg = document.getElementById(`status-${index}`);
+            const titleInput = document.getElementById(`title-${index}`);
 
             try {
-                // Update Status to Blue
-                statusText.innerText = "☁️ Uploading...";
-                statusText.className = "status-text status-uploading";
+                // Update UI to "Loading"
+                statusMsg.innerText = "⏳ Uploading...";
+                statusMsg.className = "status-msg msg-waiting";
+                statusMsg.style.display = "block";
+                titleInput.disabled = true; // Lock input
 
-                // Check Size (20MB Limit)
-                if (file.size > 20 * 1024 * 1024) {
-                    throw new Error("File too large (>20MB)");
-                }
+                // Size Check
+                if (file.size > 20 * 1024 * 1024) throw new Error("File too large (>20MB)");
 
-                // A. Generate Unique Name
-                // We use the original filename as the Title for batch uploads
+                // A. Generate Filename
                 const safeName = commonData.course_code.replace(/[^a-z0-9]/gi, '');
                 const fileExt = file.name.split('.').pop();
                 const uniqueId = Math.random().toString(36).substring(7);
                 const fileName = `${commonData.owner_dept}/${commonData.level}/${safeName}_${uniqueId}.${fileExt}`;
 
-                // B. Get URL from Netlify
+                // B. Get URL
                 const response = await fetch('/.netlify/functions/api', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -251,10 +290,10 @@
                     headers: { 'Content-Type': file.type }
                 });
 
-                // D. Save to DB
+                // D. Save to DB (USING THE CUSTOM TITLE)
                 const { error } = await db.from('study_materials').insert([{
                     ...commonData,
-                    title: file.name.replace('.pdf', ''), // Use filename as title
+                    title: title, // <--- Using the editable title here
                     visible_to: [commonData.owner_dept],
                     file_key: fileName,
                     file_size: (file.size / 1024 / 1024).toFixed(2) + " MB"
@@ -262,17 +301,17 @@
 
                 if (error) throw error;
 
-                // Success State (Green)
-                card.classList.add('status-success'); // Adds green background
-                statusText.innerText = "✅ Done";
-                statusText.className = "status-text"; // Reset text color to inherit from parent
+                // Success
+                card.classList.add('status-success');
+                statusMsg.innerText = "✅ Uploaded Successfully";
+                statusMsg.className = "status-msg msg-success";
 
             } catch (err) {
-                // Error State (Red)
+                // Error
                 console.error(err);
-                card.classList.add('status-error'); // Adds red background
-                statusText.innerText = "❌ " + err.message;
-                statusText.className = "status-text";
+                card.classList.add('status-error');
+                statusMsg.innerText = "❌ " + err.message;
+                statusMsg.className = "status-msg msg-error";
             }
         }
     </script>
