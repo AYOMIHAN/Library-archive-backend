@@ -53,7 +53,9 @@
         // 1. SETUP KEYS
         const SUPABASE_URL = "https://tfjxfmjcmynwwhslzvdy.supabase.co"; 
         const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRmanhmbWpjbXlud3doc2x6dmR5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUxOTExNzEsImV4cCI6MjA4MDc2NzE3MX0.9T3c3b18rczwWTYKE8387PfIqueKzA4rkbLR4TYYxcc"; 
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        
+        // --- FIX IS HERE: Named it 'db' instead of 'supabase' ---
+        const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         // 2. MAIN UPLOAD FUNCTION
         async function startUpload() {
@@ -67,7 +69,6 @@
                 return;
             }
 
-            // Lock the button
             btn.disabled = true;
             btn.innerText = "Wait...";
 
@@ -84,7 +85,6 @@
                     semester: document.getElementById('semester').value,
                 };
                 
-                // Simple validation
                 if(!metadata.course_code || !metadata.title || !metadata.owner_dept) {
                     throw new Error("Please fill in all text fields.");
                 }
@@ -121,9 +121,9 @@
                     headers: { 'Content-Type': file.type }
                 });
 
-                // D. SAVE TO DATABASE
+                // D. SAVE TO DATABASE (Using 'db' now)
                 status.innerText = "💾 Saving info...";
-                const { error } = await supabase.from('study_materials').insert([{
+                const { error } = await db.from('study_materials').insert([{
                     ...metadata,
                     visible_to: [metadata.owner_dept],
                     file_key: fileName,
@@ -136,6 +136,14 @@
                 status.innerText = "✅ Upload Successful!";
                 status.style.color = "green";
                 btn.innerText = "Done";
+                
+                // Clear form
+                setTimeout(() => {
+                    status.innerText = "";
+                    btn.innerText = "🚀 Upload Material";
+                    document.getElementById('title').value = "";
+                    document.getElementById('course_code').value = "";
+                }, 3000);
 
             } catch (err) {
                 console.error(err);
