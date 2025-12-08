@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FUTA Study Archive</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        /* VANILLA CSS - Simple & Clean */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+            margin: 0;
+        }
+
+        .container {
+            background: white;
+            width: 100%;
+            max-width: 500px;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-top: 0;
+        }
+
+        p.subtitle {
+            text-align: center;
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            font-size: 0.85rem;
+            color: #444;
+            text-transform: uppercase;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            box-sizing: border-box; /* Keeps padding inside width */
+            font-size: 1rem;
+        }
+
+        /* Two columns for smaller inputs */
+        .row {
+            display: flex;
+            gap: 15px;
+        }
+        .col {
+            flex: 1;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #2563eb; /* Blue */
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background-color: #1d4ed8;
+        }
+
+        button:disabled {
+            background-color: #93c5fd;
+            cursor: not-allowed;
+        }
+
+        #status {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            min-height: 20px;
+        }
+
+        .success { color: green; font-weight: bold; }
+        .error { color: red; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>FUTA Study Archive</h2>
+        <p class="subtitle">Upload Lecture Notes & Handouts</p>
+
+        <form id="uploadForm">
+            
+            <div class="row">
+                <div class="col form-group">
+                    <label>Course Code</label>
+                    <input type="text" id="course_code" placeholder="MTS 101" required>
+                </div>
+                <div class="col form-group">
+                    <label>File Title</label>
+                    <input type="text" id="title" placeholder="Algebra Notes" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Owner Department</label>
+                <input type="text" id="owner_dept" placeholder="IDD" required>
+            </div>
+
+            <div class="row">
+                <div class="col form-group">
+                    <label>Level</label>
+                    <select id="level">
+                        <option value="100">100 L</option>
+                        <option value="200">200 L</option>
+                        <option value="300">300 L</option>
+                        <option value="400">400 L</option>
+                        <option value="500">500 L</option>
+                    </select>
+                </div>
+                <div class="col form-group">
+                    <label>Semester</label>
+                    <select id="semester">
+                        <option value="1">Harmattan (1st)</option>
+                        <option value="2">Rain (2nd)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>PDF File</label>
+                <input type="file" id="fileInput" accept="application/pdf" required>
+            </div>
+
+            <button type="submit" id="submitBtn">🚀 Upload Material</button>
+            
+            <p id="status"></p>
+        </form>
+    </div>
+
+    <script>
+        // --- YOUR KEYS (PRE-FILLED) ---
+        const SUPABASE_URL = "https://tfjxfmjcmynwwhslzvdy.supabase.co"; 
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRmanhmbWpjbXlud3doc2x6dmR5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUxOTExNzEsImV4cCI6MjA4MDc2NzE3MX0.9T3c3b18rczwWTYKE8387PfIqueKzA4rkbLR4TYYxcc"; 
+        
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        const form = document.getElementById('uploadForm');
+        const status = document.getElementById('status');
+        const btn = document.getElementById('submitBtn');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const file = document.getElementById('fileInput').files[0];
+            if (!file) {
+                alert("Please select a file!");
+                return;
+            }
+
+            // Collect Data
+            const metadata = {
+                course_code: document.getElementById('course_code').value.toUpperCase().trim(),
+                title: document.getElementById('title').value.trim(),
+                level: parseInt(document.getElementById('level').value),
+                semester: document.getElementById('semester').value,
+                owner_dept: document.getElementById('owner_dept').value.toUpperCase().trim(),
+            };
+            metadata.visible_to = [metadata.owner_dept];
+
+            try {
+                // 1. UI Loading State
+                btn.disabled = true;
+                btn.innerText = "Processing...";
+                status.innerText = "⏳ Generating secure keys...";
+                status.className = "";
+
+                // 2. Prepare Filename
+                const fileExt = file.name.split('.').pop();
+                const safeName = metadata.course_code.replace(/[^a-z0-9]/gi, ''); 
+                const fileName = `${metadata.owner_dept}/${metadata.level}/${safeName}_${Date.now()}.${fileExt}`;
+
+                // 3. Get Upload URL from Backend
+                const response = await fetch('/api', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        action: 'upload', 
+                        file_key: fileName, 
+                        file_type: file.type 
+                    })
+                });
+                
+                const responseData = await response.json();
+                if (!responseData.url) throw new Error("Backend Error: " + (responseData.error || "No URL returned"));
+
+                // 4. Upload to Cloudflare
+                status.innerText = "☁️ Uploading to Cloudflare...";
+                await fetch(responseData.url, {
+                    method: 'PUT',
+                    body: file,
+                    headers: { 'Content-Type': file.type }
+                });
+
+                // 5. Save to Supabase
+                status.innerText = "💾 Saving to Database...";
+                const { error } = await supabase.from('study_materials').insert([{
+                    ...metadata,
+                    file_key: fileName,
+                    file_size: (file.size / 1024 / 1024).toFixed(2) + " MB"
+                }]);
+
+                if (error) throw error;
+
+                // 6. Success
+                status.innerText = "✅ Upload Successful!";
+                status.className = "success";
+                form.reset();
+                
+                // Reset text after 3 seconds
+                setTimeout(() => {
+                    status.innerText = "";
+                    btn.innerText = "🚀 Upload Material";
+                }, 3000);
+
+            } catch (err) {
+                console.error(err);
+                status.innerText = "❌ Error: " + err.message;
+                status.className = "error";
+            } finally {
+                btn.disabled = false;
+                if(status.className !== "success") btn.innerText = "🚀 Upload Material";
+            }
+        });
+    </script>
+</body>
+              </html>
+              
