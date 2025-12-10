@@ -34,27 +34,15 @@ const filterSelects = document.querySelectorAll('.filter-group select');
 async function fetchMaterials() {
     if (!grid) return;
 
-    // Show loading state
     countLabel.innerText = "Searching database...";
     grid.innerHTML = '<p style="text-align:center; color:#6b7280; width:100%; margin-top:20px;">Loading materials...</p>';
 
-    // Get values from UI
     const searchTerm = searchInput.value.trim();
     const schoolFilter = filterSelects[0].value;
     const levelFilter = filterSelects[1].value;
     const semFilter = filterSelects[2].value;
 
-    // Only search if at least ONE filter is active
-    if (!searchTerm && !schoolFilter && !levelFilter && !semFilter) {
-        showEmptyState();
-        return;
-    }
-
-    // Start building the query
-    let query = supabase
-        .from('materials') 
-        .select('*')
-        .limit(50); 
+    let query = supabase.from('materials').select('*').limit(50);
 
     if (searchTerm) {
         query = query.or(`title.ilike.%${searchTerm}%,course_code.ilike.%${searchTerm}%`);
@@ -68,14 +56,13 @@ async function fetchMaterials() {
     if (error) {
         console.error('Error fetching data:', error);
         countLabel.innerText = "Error loading data.";
-        grid.innerHTML = '<p style="text-align:center; color:red; width:100%;">Database Error. Check console.</p>';
         return;
     }
 
     renderLibrary(data);
 }
 
-// --- RENDER FUNCTION ---
+// --- RENDER FUNCTION (UPDATED FOR COUNTDOWN) ---
 function renderLibrary(data) {
     grid.innerHTML = ""; 
 
@@ -113,28 +100,85 @@ function renderLibrary(data) {
                 <div class="visible-meta">${file.level}L • ${file.semester} Sem • ${file.file_size}</div>
             </div>
             <div class="card-footer">
-                <a href="${file.download_url}" target="_blank" class="btn-download-full">Download ${file.file_type}</a>
+                <button class="btn-download-full" onclick="startDownload('${file.download_url}', this)">
+                    Download ${file.file_type}
+                </button>
             </div>
         `;
         grid.appendChild(card);
     });
 }
 
-// --- EMPTY STATE (Instructions) ---
-function showEmptyState() {
-    if (!countLabel || !grid) return;
+// --- NEW: COUNTDOWN LOGIC ---
+function startDownload(url, btnElement) {
+    // 1. Save original text so we can put it back later
+    const originalText = btnElement.innerText;
     
-    countLabel.innerText = "Start Searching";
-    grid.innerHTML = `
-        <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #64748b;">
-            <div style="font-size: 3rem; margin-bottom: 10px;">🔍</div>
-            <h3 style="font-size: 1.2rem; color: #1e293b; margin-bottom: 5px;">Ready to Explore?</h3>
-            <p>Select a School, Level, or type a Course Code above to find materials.</p>
-        </div>
-    `;
+    // 2. Initial State
+    let timeLeft = 5; // Seconds to wait
+    btnElement.disabled = true; // Disable clicking
+    btnElement.style.backgroundColor = "#94a3b8"; // Turn grey
+    btnElement.style.cursor = "wait";
+    btnElement.innerText = `Generating Link (${timeLeft}s)...`;
+
+    // 3. Start Timer
+    const timer = setInterval(() => {
+        timeLeft--;
+        btnElement.innerText = `Generating Link (${timeLeft}s)...`;
+
+        // 4. Time's Up!
+        if (timeLeft <= 0) {
+            clearInterval(timer);
+            
+            // Show success
+            btnElement.style.backgroundColor = "#22c55e"; // Green color
+            btnElement.innerText = "Download Started! 🚀";
+            
+            // Open the link (The actual download)
+            window.open(url, '_blank');
+
+            // 5. Reset Button after 3 seconds
+            setTimeout(() => {
+                btnElement.innerText = originalText;
+                btnElement.disabled = false;
+                btnElement.style.backgroundColor = ""; // Reset to CSS default (Blue)
+                btnElement.style.cursor = "pointer";
+            }, 3000);
+        }
+    }, 1000);
 }
 
-// --- DEBOUNCE ---
+// --- INITIALIZE ---
+document.addEventListener("DOMContentLoaded", () => {
+    addSupportButton();
+
+    if (searchInput) {
+        // Check for URL params
+        const urlParams = new URLSearchParams(window.location.search);
+        const schoolParam = urlParams.get('school');
+
+        if (schoolParam) {
+            filterSelects[0].value = schoolParam;
+            fetchMaterials();
+        } else {
+            // Show instructions
+            countLabel.innerText = "Start Searching";
+            grid.innerHTML = `
+                <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #64748b;">
+                    <div style="font-size: 3rem; margin-bottom: 10px;">🔍</div>
+                    <h3 style="font-size: 1.2rem; color: #1e293b; margin-bottom: 5px;">Ready to Explore?</h3>
+                    <p>Select a School, Level, or type a Course Code above to find materials.</p>
+                </div>
+            `;
+        }
+
+        // Listeners
+        const debouncedSearch = debounce(() => fetchMaterials(), 500);
+        searchInput.addEventListener('input', debouncedSearch);
+        filterSelects.forEach(select => select.addEventListener('change', fetchMaterials));
+    }
+});
+
 function debounce(func, wait) {
     let timeout;
     return function(...args) {
@@ -143,46 +187,15 @@ function debounce(func, wait) {
     };
 }
 
-// --- INITIALIZE & URL PARSING ---
-document.addEventListener("DOMContentLoaded", () => {
-    addSupportButton();
-
-    if (searchInput) {
-        // 1. Check if user came from Home Page (URL Params)
-        const urlParams = new URLSearchParams(window.location.search);
-        const schoolParam = urlParams.get('school');
-
-        if (schoolParam) {
-            // Auto-select dropdown and Fetch
-            filterSelects[0].value = schoolParam;
-            fetchMaterials();
-        } else {
-            // Show instructions if just visiting page directly
-            showEmptyState();
-        }
-
-        // 2. Setup Listeners
-        const debouncedSearch = debounce(() => fetchMaterials(), 500);
-        searchInput.addEventListener('input', debouncedSearch);
-        filterSelects.forEach(select => select.addEventListener('change', fetchMaterials));
-    }
-});
-
-// 4. FLOATING BUTTON LOGIC
+// 4. FLOATING BUTTON
 function addSupportButton() {
     const whatsappLink = "https://wa.link/15dowu"; 
     const btn = document.createElement('a');
     btn.href = whatsappLink;
     btn.target = "_blank";
     btn.className = "floating-btn";
-    btn.innerHTML = `
-        <span class="support-tooltip">Need Help?</span>
-        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-        </svg>
-    `;
+    btn.innerHTML = `<span class="support-tooltip">Need Help?</span><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>`;
     document.body.appendChild(btn);
-
     let scrollTimeout;
     const tooltip = btn.querySelector('.support-tooltip');
     window.addEventListener('scroll', () => {
@@ -190,4 +203,5 @@ function addSupportButton() {
         clearTimeout(scrollTimeout);
         scrollTimeout = setTimeout(() => { tooltip.classList.remove('show'); }, 3000);
     });
-}
+        }
+        
