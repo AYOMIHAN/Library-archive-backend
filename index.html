@@ -3,70 +3,227 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Campus e-Library | Home</title>
-    
-    <link rel="stylesheet" href="css/index.css">
+    <title>Campus e-Library</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <nav class="navbar">
-        <a href="index.html" class="logo">Campus e-Library</a>
-        <div class="nav-links">
-            <a href="index.html" class="active">Home</a>
-            <a href="library.html">Browse</a>
-            <a href="upload.html" class="btn-upload">Upload</a>
+        <div class="container">
+            <a href="#" class="logo">Campus<span>e-Library</span></a>
+            <ul class="nav-menu">
+                <li><a href="#" class="nav-link active">Home</a></li>
+                <li><a href="#" class="nav-link">Library</a></li>
+                <li><a href="#" class="nav-link">Blogs</a></li>
+                <li><a href="#" class="nav-link">About</a></li>
+                <li><a href="#" class="btn-primary">Contact</a></li>
+            </ul>
+            <button class="hamburger" id="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </button>
         </div>
     </nav>
 
-    <section class="hero">
-        <div class="hero-content">
-            <h1>Smarter Studying Starts <span class="highlight">Here.</span></h1>
-            <p>Access curated lecture notes, handouts, and past questions for FUTA students. Fast, free, and organized.</p>
-            
-            <div class="search-container">
-                <form id="homeSearchForm">
-                    <input type="text" id="homeSearchInput" class="search-input" placeholder="Search for a course (e.g. MTS 101)..." required>
-                    <button type="submit" class="search-btn">Search</button>
-                </form>
-            </div>
+    <div class="mobile-nav" id="mobileNav">
+        <a href="#">Home</a>
+        <a href="#">Library</a>
+        <a href="#">Blogs</a>
+        <a href="#">About</a>
+        <a href="#">Contact Us</a>
+    </div>
+
+    <section class="hero-section">
+        <span class="hero-badge">🎓 For FUTA Students</span>
+        <h1>
+            Find the Right Materials<br>
+            <span class="highlight">without Stress.</span>
+        </h1>
+        <p>
+            All your essential study materials in one easy, accessible place.
+        </p>
+        <div class="hero-actions">
+            <a href="#" class="btn-hero-primary">Explore Library</a>
         </div>
     </section>
 
-    <section class="features">
-        <div class="section-title">Quick Access by Level</div>
+    <section class="features-section">
+        <div class="section-header">
+            <h2>Why Campus e-Library?</h2>
+            <p>To make studying easier by keeping all your materials in one accessible space.</p>
+        </div>
         
-        <div class="grid">
-            <div class="card" onclick="goToLibrary('100')">
-                <span class="card-icon">🌱</span>
-                <div class="card-title">100 Level</div>
-                <div class="card-desc">Freshman Essentials</div>
+        <div class="features-grid">
+            
+            <div class="feature-card">
+                <div class="icon-circle">🔓</div>
+                <div class="feature-content">
+                    <h3>100% Free Access</h3>
+                    <p>Education shouldn't come with a price tag. Access all library materials completely free, forever.</p>
+                </div>
+            </div>
+            
+            <div class="feature-card">
+                <div class="icon-circle">🧘</div>
+                <div class="feature-content">
+                    <h3>Stress-Free Study</h3>
+                    <p>Stop worrying about missing materials. We have everything you need in one place.</p>
+                </div>
+            </div>
+            
+            <div class="feature-card">
+                <div class="icon-circle">⚡</div>
+                <div class="feature-content">
+                    <h3>Zero Wait Time</h3>
+                    <p>Direct PDF downloads. No signup walls, no ads, no broken links. Just click and read.</p>
+                </div>
             </div>
 
-            <div class="card" onclick="goToLibrary('200')">
-                <span class="card-icon">🚀</span>
-                <div class="card-title">200 Level</div>
-                <div class="card-desc">Core Foundations</div>
+            <div class="feature-card">
+                <div class="icon-circle">📂</div>
+                <div class="feature-content">
+                    <h3>Highly Organized</h3>
+                    <p>Materials are sorted by School, Department, Level, and Semester. Find what you need instantly.</p>
+                </div>
             </div>
-
-            <div class="card" onclick="goToLibrary('300')">
-                <span class="card-icon">⚙️</span>
-                <div class="card-title">300 Level</div>
-                <div class="card-desc">Advanced Theory</div>
-            </div>
-
-            <div class="card" onclick="goToLibrary('400')">
-                <span class="card-icon">🎓</span>
-                <div class="card-title">400/500 Level</div>
-                <div class="card-desc">Final Year Projects</div>
+            
+            <div class="feature-card">
+                <div class="icon-circle">📝</div>
+                <div class="feature-content">
+                    <h3>Past Questions</h3>
+                    <p>Don't just read notes. Access a vast archive of past exam questions to prepare effectively.</p>
+                </div>
             </div>
         </div>
     </section>
 
-    <footer>
-        <p>&copy; 2025 Campus e-Library. Built for Students.</p>
+    <section class="schools-section">
+        <div class="section-header">
+            <h2>Select Your School</h2>
+            <p>Browse materials by Faculty/School.</p>
+        </div>
+
+        <div class="schools-grid">
+            <div class="school-card">
+                <div class="school-badge">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22v-8"/><path d="M5.8 11.3C5.8 6.7 12 3 12 3s6.2 3.7 6.2 8.3c0 3.8-2.8 6.7-6.2 6.7S5.8 15 5.8 11.3z"/><path d="M8 14s-3 1-3 4"/><path d="M16 14s3 1 3 4"/></svg>
+                </div>
+                <div class="school-info">
+                    <h3>SAAT</h3>
+                    <span>School of Agriculture & Agricultural Tech</span>
+                </div>
+            </div>
+
+            <div class="school-card">
+                <div class="school-badge">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                </div>
+                <div class="school-info">
+                    <h3>SEET</h3>
+                    <span>School of Engineering & Engineering Tech</span>
+                </div>
+            </div>
+
+            <div class="school-card">
+                <div class="school-badge">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+                </div>
+                <div class="school-info">
+                    <h3>SEMS</h3>
+                    <span>School of Earth & Mineral Sciences</span>
+                </div>
+            </div>
+            
+            <div class="school-card">
+                <div class="school-badge">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M9 21V8a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v13"/><path d="M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"/></svg>
+                </div>
+                <div class="school-info">
+                    <h3>SET</h3>
+                    <span>School of Environmental Technology</span>
+                </div>
+            </div>
+
+            <div class="school-card">
+                <div class="school-badge">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3 4 7l4 4"/><path d="M4 7h16"/><path d="m16 21 4-4-4-4"/><path d="M20 17H4"/></svg>
+                </div>
+                <div class="school-info">
+                    <h3>SLIT</h3>
+                    <span>School of Logistic & Innovation Tech</span>
+                </div>
+            </div>
+            
+            <div class="school-card">
+                <div class="school-badge">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 12a2 2 0 1 0 4 0 2 2 0 0 0-4 0"/><path d="M20.3 6.9c.8-.5 1.5-1.1 1.7-1.9.7-2.7-3.4-3.3-4.6-1.6C15 6.5 13 10 12 12s-3 5.5-5.4 8.6c-1.2 1.7-5.3 1.1-4.6-1.6.2-.8.9-1.4 1.7-1.9"/></svg>
+                </div>
+                <div class="school-info">
+                    <h3>SLS</h3>
+                    <span>School of Life Sciences</span>
+                </div>
+            </div>
+
+            <div class="school-card">
+                <div class="school-badge">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"/><path d="M20.2 20.2c2.4-2.4 2.4-6.3 0-8.7L12 3 3.8 11.2c-2.4 2.4-2.4 6.3 0 8.7 2.4 2.4 6.3 2.4 8.7 0L21 12"/></svg>
+                </div>
+                <div class="school-info">
+                    <h3>SPS</h3>
+                    <span>School of Physical Sciences</span>
+                </div>
+            </div>
+            
+            <div class="school-card">
+                <div class="school-badge">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="16" y="16" width="6" height="6" rx="1"/><rect x="2" y="16" width="6" height="6" rx="1"/><rect x="9" y="2" width="6" height="6" rx="1"/><path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3"/><path d="M12 12V8"/></svg>
+                </div>
+                <div class="school-info">
+                    <h3>SOC</h3>
+                    <span>School of Computing</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="site-footer">
+        <div class="footer-grid">
+            <div class="footer-col">
+                <div class="logo footer-logo">Campus<span>e-Library</span></div>
+                <p class="footer-desc">A centralized platform designed to make academic resources accessible to every student, anytime, anywhere.</p>
+            </div>
+            
+            <div class="footer-col">
+                <h3>Explore</h3>
+                <ul class="footer-links">
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">Library</a></li>
+                    <li><a href="#">Blogs</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-col">
+                <h3>Support & Legal</h3>
+                <ul class="footer-links">
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">Contact</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms of Use</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; 2025 Campus e-Library. All rights reserved.</p>
+        </div>
     </footer>
 
-    <script src="index.js"></script>
-
+    <script src="script.js"></script>
 </body>
-</html>
+                                                                                                                                                                                                              </html>
+                                                                                                                                                                                                              
