@@ -1,0 +1,83 @@
+/* =========================================
+   LIBRARY PAGE STYLES
+   ========================================= */
+.library-header { background-color: var(--bg-white); padding: 130px 20px 40px; border-bottom: 1px solid #e5e7eb; }
+.library-header h1 { font-size: 2.2rem; font-weight: 800; margin-bottom: 10px; }
+.library-header p { color: var(--text-muted); margin-bottom: 30px; }
+
+/* Filter Bar (Desktop) */
+.filter-bar { background: #f8fafc; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0; display: flex; gap: 15px; align-items: center; }
+.search-input { flex: 2; position: relative; } 
+.search-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); opacity: 0.5; }
+.search-input input { width: 100%; padding: 14px 12px 14px 45px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 1rem; outline: none; }
+.filter-group { flex: 1; display: flex; gap: 10px; }
+.filter-group select { flex: 1; padding: 14px; border: 1px solid #cbd5e1; border-radius: 6px; background: white; outline: none; cursor: pointer; }
+
+/* --- Materials Grid --- */
+.library-content { padding: 40px 20px 80px; }
+.results-count { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 20px; font-weight: 600; text-transform: uppercase; display: block; }
+.materials-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 25px; }
+
+/* --- RECTANGULAR CARD DESIGN --- */
+.material-card {
+    background: white;
+    border-radius: 8px; /* Sharp Corners */
+    padding: 20px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.material-card:hover { transform: translateY(-3px); box-shadow: 0 8px 15px rgba(0, 0, 0, 0.08); border-color: var(--primary); }
+
+.card-header { display: flex; gap: 16px; align-items: flex-start; }
+.file-icon-box {
+    width: 50px; height: 50px; background-color: var(--primary); 
+    border-radius: 6px; 
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; color: white; 
+}
+.file-icon-box svg { width: 26px; height: 26px; }
+
+.header-info h3 { font-size: 1.1rem; font-weight: 700; color: var(--text-main); margin-bottom: 4px; line-height: 1.2; }
+.meta-row { display: flex; align-items: center; gap: 10px; }
+.size-badge {
+    background-color: #f1f5f9; color: var(--text-muted); 
+    font-size: 0.75rem; font-weight: 600; padding: 2px 8px; border-radius: 4px; border: 1px solid #e2e8f0;
+}
+.course-code { font-size: 0.85rem; color: var(--primary); font-weight: 700; }
+
+.card-body p { font-size: 0.9rem; color: #4b5563; line-height: 1.5; border-top: 1px solid #f3f4f6; padding-top: 12px; margin-bottom: 2px; }
+.visible-meta { font-size: 0.8rem; color: var(--text-main); font-weight: 600; margin-bottom: 5px; }
+
+.btn-download-full {
+    width: 100%; background-color: var(--primary); color: white; font-weight: 600;
+    padding: 10px; border-radius: 6px; border: none; cursor: pointer; 
+    display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.95rem; transition: background 0.2s; margin-top: auto;
+}
+.btn-download-full:hover { background-color: var(--primary-dark); }
+
+/* --- Library Mobile Fixes --- */
+@media (max-width: 768px) {
+    .library-header { padding-top: 100px; }
+    
+    /* STACKED FILTER BAR */
+    .filter-bar { 
+        flex-direction: column; 
+        align-items: stretch; 
+        padding: 15px; 
+    }
+    .search-input { width: 100%; margin-bottom: 10px; min-width: 0; }
+    
+    /* WRAP DROPDOWNS (School on top, Level/Sem split) */
+    .filter-group { width: 100%; min-width: 0; flex-wrap: wrap; gap: 10px; }
+    
+    .filter-group select { flex: 1 1 100%; } /* Default full width */
+    .filter-group select:first-child { flex: 1 1 100%; } /* School = 100% */
+    .filter-group select:nth-child(2), 
+    .filter-group select:nth-child(3) { flex: 1 1 45%; } /* Level & Sem = 50/50 */
+    
+    .materials-grid { grid-template-columns: 1fr; }
+}
