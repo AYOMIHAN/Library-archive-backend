@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browse Library - Campus e-Library</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/library.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="container">
+            <a href="index.html" class="logo">Campus<span>e-Library</span></a>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="library.html" class="nav-link active">Library</a></li>
+                <li><a href="#" class="nav-link">Blogs</a></li>
+                <li><a href="#" class="nav-link">About</a></li>
+                <li><a href="#" class="btn-primary">Contact</a></li>
+            </ul>
+            <button class="hamburger" id="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </button>
+        </div>
+    </nav>
+
+    <div class="mobile-nav" id="mobileNav">
+        <a href="index.html">Home</a>
+        <a href="library.html">Library</a>
+        <a href="#">Blogs</a>
+        <a href="#">About</a>
+        <a href="#">Contact Us</a>
+    </div>
+
+    <section class="library-header">
+        <div class="container">
+            <h1>Library Archive</h1>
+            <p>Search by course code or filter by department.</p>
+            
+            <div class="filter-bar">
+                <div class="search-input">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" placeholder="Search course (e.g. MTS 101)...">
+                </div>
+                
+                <div class="filter-group">
+                    <select>
+                        <option value="">All Schools</option>
+                        <option value="SEET">SEET</option>
+                        <option value="SAAT">SAAT</option>
+                        <option value="SOS">SOS</option>
+                        <option value="SET">SET</option>
+                        <option value="SOC">SOC</option>
+                        <option value="GNS">GNS</option>
+                    </select>
+                    
+                    <select>
+                        <option value="">Level</option>
+                        <option value="100">100 L</option>
+                        <option value="200">200 L</option>
+                        <option value="300">300 L</option>
+                        <option value="400">400 L</option>
+                        <option value="500">500 L</option>
+                    </select>
+
+                    <select>
+                        <option value="">Sem</option>
+                        <option value="1st">1st Sem</option>
+                        <option value="2nd">2nd Sem</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="library-content">
+        <div class="container">
+            <h3 class="results-count" id="result-count">Connecting to database...</h3>
+            
+            <div class="materials-grid" id="library-grid">
+                </div>
+        </div>
+    </section>
+
+    <footer class="site-footer">
+        <div class="footer-grid">
+            <div class="footer-col">
+                <div class="logo footer-logo">Campus<span>e-Library</span></div>
+                <p class="footer-desc">A centralized platform designed to make academic resources accessible to every student, anytime, anywhere.</p>
+            </div>
+            
+            <div class="footer-col">
+                <h3>Explore</h3>
+                <ul class="footer-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="library.html">Library</a></li>
+                    <li><a href="#">Blogs</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-col">
+                <h3>Support & Legal</h3>
+                <ul class="footer-links">
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">Contact</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms of Use</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; 2025 Campus e-Library. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/script.js"></script>
+</body>
+</html>
