@@ -18,7 +18,7 @@ if (hamburger) {
     });
 }
 
-// 2. SUPABASE CONFIGURATION (Connected!)
+// 2. SUPABASE CONFIGURATION
 const SUPABASE_URL = 'https://tfjxfmjcmynwwhslzvdy.supabase.co'; 
 const SUPABASE_KEY = 'sb_publishable_cEjENOV9eLIWWl9KshKojQ_jTnwFhoa'; 
 
@@ -30,7 +30,7 @@ const countLabel = document.getElementById('result-count');
 const searchInput = document.querySelector('.search-input input');
 const filterSelects = document.querySelectorAll('.filter-group select');
 
-// --- FETCH FUNCTION (The Database Logic) ---
+// --- FETCH FUNCTION ---
 async function fetchMaterials() {
     if (!grid) return;
 
@@ -44,23 +44,25 @@ async function fetchMaterials() {
     const levelFilter = filterSelects[1].value;
     const semFilter = filterSelects[2].value;
 
+    // Only search if at least ONE filter is active
+    if (!searchTerm && !schoolFilter && !levelFilter && !semFilter) {
+        showEmptyState();
+        return;
+    }
+
     // Start building the query
     let query = supabase
         .from('materials') 
         .select('*')
-        .limit(50); // Optimization: Load max 50 items initially
+        .limit(50); 
 
-    // 1. Search Filter (Checks Title OR Course Code)
     if (searchTerm) {
         query = query.or(`title.ilike.%${searchTerm}%,course_code.ilike.%${searchTerm}%`);
     }
-
-    // 2. Dropdown Filters
     if (schoolFilter) { query = query.eq('school', schoolFilter); }
     if (levelFilter) { query = query.eq('level', levelFilter); }
     if (semFilter) { query = query.eq('semester', semFilter); }
 
-    // Execute Query
     const { data, error } = await query;
 
     if (error) {
@@ -70,13 +72,12 @@ async function fetchMaterials() {
         return;
     }
 
-    // Render Results
     renderLibrary(data);
 }
 
-// --- RENDER FUNCTION (Builds HTML) ---
+// --- RENDER FUNCTION ---
 function renderLibrary(data) {
-    grid.innerHTML = ""; // Clear loader
+    grid.innerHTML = ""; 
 
     if (!data || data.length === 0) {
         countLabel.innerText = "No results found";
@@ -90,14 +91,9 @@ function renderLibrary(data) {
         const card = document.createElement('div');
         card.className = 'material-card';
 
-        // Check if PDF or DOC for icon color
         const isPdf = file.file_type === 'PDF';
         const iconClass = isPdf ? "file-icon-box" : "file-icon-box doc-theme";
-        
-        // Add specific style for DOC type if needed (assuming .doc-theme exists in CSS or inline style here)
         const iconStyle = !isPdf ? 'background-color:#dbeafe; color:#2563eb;' : '';
-
-        // SVG Icon
         const iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>`;
 
         card.innerHTML = `
@@ -112,22 +108,33 @@ function renderLibrary(data) {
                     </div>
                 </div>
             </div>
-            
             <div class="card-body">
                 <p>${file.description || 'No description available.'}</p>
                 <div class="visible-meta">${file.level}L • ${file.semester} Sem • ${file.file_size}</div>
             </div>
-
             <div class="card-footer">
                 <a href="${file.download_url}" target="_blank" class="btn-download-full">Download ${file.file_type}</a>
             </div>
         `;
-
         grid.appendChild(card);
     });
 }
 
-// --- DEBOUNCE (Prevents spamming the database) ---
+// --- EMPTY STATE (Instructions) ---
+function showEmptyState() {
+    if (!countLabel || !grid) return;
+    
+    countLabel.innerText = "Start Searching";
+    grid.innerHTML = `
+        <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #64748b;">
+            <div style="font-size: 3rem; margin-bottom: 10px;">🔍</div>
+            <h3 style="font-size: 1.2rem; color: #1e293b; margin-bottom: 5px;">Ready to Explore?</h3>
+            <p>Select a School, Level, or type a Course Code above to find materials.</p>
+        </div>
+    `;
+}
+
+// --- DEBOUNCE ---
 function debounce(func, wait) {
     let timeout;
     return function(...args) {
@@ -136,20 +143,27 @@ function debounce(func, wait) {
     };
 }
 
-// --- INITIALIZE & LISTENERS ---
+// --- INITIALIZE & URL PARSING ---
 document.addEventListener("DOMContentLoaded", () => {
     addSupportButton();
 
-    // Only run library logic if we are on the library page
     if (searchInput) {
-        // Initial Fetch
-        fetchMaterials();
+        // 1. Check if user came from Home Page (URL Params)
+        const urlParams = new URLSearchParams(window.location.search);
+        const schoolParam = urlParams.get('school');
 
-        // Search with Debounce
+        if (schoolParam) {
+            // Auto-select dropdown and Fetch
+            filterSelects[0].value = schoolParam;
+            fetchMaterials();
+        } else {
+            // Show instructions if just visiting page directly
+            showEmptyState();
+        }
+
+        // 2. Setup Listeners
         const debouncedSearch = debounce(() => fetchMaterials(), 500);
         searchInput.addEventListener('input', debouncedSearch);
-
-        // Filter Dropdowns
         filterSelects.forEach(select => select.addEventListener('change', fetchMaterials));
     }
 });
@@ -176,5 +190,4 @@ function addSupportButton() {
         clearTimeout(scrollTimeout);
         scrollTimeout = setTimeout(() => { tooltip.classList.remove('show'); }, 3000);
     });
-                 }
-        
+}
