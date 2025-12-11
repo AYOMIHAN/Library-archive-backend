@@ -21,7 +21,7 @@
 /* --- RECTANGULAR CARD DESIGN --- */
 .material-card {
     background: white;
-    border-radius: 8px; /* Sharp Corners */
+    border-radius: 8px; 
     padding: 20px;
     border: 1px solid #e2e8f0;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
@@ -42,11 +42,7 @@
 .file-icon-box svg { width: 26px; height: 26px; }
 
 .header-info h3 { font-size: 1.1rem; font-weight: 700; color: var(--text-main); margin-bottom: 4px; line-height: 1.2; }
-.meta-row { display: flex; align-items: center; gap: 10px; }
-.size-badge {
-    background-color: #f1f5f9; color: var(--text-muted); 
-    font-size: 0.75rem; font-weight: 600; padding: 2px 8px; border-radius: 4px; border: 1px solid #e2e8f0;
-}
+.meta-row { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
 .course-code { font-size: 0.85rem; color: var(--primary); font-weight: 700; }
 
 .card-body p { font-size: 0.9rem; color: #4b5563; line-height: 1.5; border-top: 1px solid #f3f4f6; padding-top: 12px; margin-bottom: 2px; }
@@ -63,7 +59,6 @@
 @media (max-width: 768px) {
     .library-header { padding-top: 100px; }
     
-    /* STACKED FILTER BAR */
     .filter-bar { 
         flex-direction: column; 
         align-items: stretch; 
@@ -71,13 +66,16 @@
     }
     .search-input { width: 100%; margin-bottom: 10px; min-width: 0; }
     
-    /* WRAP DROPDOWNS (School on top, Level/Sem split) */
+    /* WRAP DROPDOWNS: School 100%, Others share space */
     .filter-group { width: 100%; min-width: 0; flex-wrap: wrap; gap: 10px; }
     
-    .filter-group select { flex: 1 1 100%; } /* Default full width */
-    .filter-group select:first-child { flex: 1 1 100%; } /* School = 100% */
+    .filter-group select { flex: 1 1 100%; }
+    .filter-group select:first-child { flex: 1 1 100%; } /* School */
+    
+    /* The other 3 share space (Level, Sem, Type) */
     .filter-group select:nth-child(2), 
-    .filter-group select:nth-child(3) { flex: 1 1 45%; } /* Level & Sem = 50/50 */
+    .filter-group select:nth-child(3),
+    .filter-group select:nth-child(4) { flex: 1 1 30%; font-size: 0.85rem; padding: 10px 5px; } 
     
     .materials-grid { grid-template-columns: 1fr; }
 }
