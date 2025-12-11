@@ -18,7 +18,7 @@ if (hamburger) {
     });
 }
 
-// 2. SUPABASE CONFIG
+// 2. CONFIGURATION
 const SUPABASE_URL = 'https://tfjxfmjcmynwwhslzvdy.supabase.co'; 
 const SUPABASE_KEY = 'sb_publishable_cEjENOV9eLIWWl9KshKojQ_jTnwFhoa'; 
 const STORAGE_URL = 'https://pub-0f85cb90209746ab99254cee3df8fdbc.r2.dev'; 
@@ -39,6 +39,12 @@ let currentSearch = "";
 async function fetchMaterials() {
     if (!grid) return;
 
+    // RULE: If search is empty, DO NOT fetch. Show instructions instead.
+    if (!currentSearch) {
+        showEmptyState();
+        return;
+    }
+
     countLabel.innerText = `Searching ${currentCategory}s...`;
     grid.innerHTML = '<p style="text-align:center; color:#6b7280; width:100%; margin-top:20px;">Loading...</p>';
 
@@ -49,18 +55,16 @@ async function fetchMaterials() {
         .eq('category', currentCategory) // Filter by Active Tab
         .limit(50);
 
-    // Apply Search if typed
+    // Apply Search (Search Title, Code, OR School)
     if (currentSearch) {
-        query = query.or(`title.ilike.%${currentSearch}%,course_code.ilike.%${currentSearch}%`);
+        query = query.or(`title.ilike.%${currentSearch}%,course_code.ilike.%${currentSearch}%,school.ilike.%${currentSearch}%`);
     }
 
     const { data, error } = await query;
 
     if (error) {
-        // Log the actual error to console so you can see it
-        console.error("SUPABASE ERROR:", error.message); 
+        console.error(error);
         countLabel.innerText = "Error loading data.";
-        grid.innerHTML = `<p style="text-align:center; color:red; width:100%;">Database Error: ${error.message}</p>`;
         return;
     }
 
@@ -71,13 +75,13 @@ async function fetchMaterials() {
 function renderLibrary(data) {
     grid.innerHTML = ""; 
 
-    // NO RESULTS
+    // NO RESULTS FOUND (User typed something, but we have nothing)
     if (!data || data.length === 0) {
         const message = currentSearch 
             ? `Hello, I searched for "${currentSearch}" in ${currentCategory}s but couldn't find it. Can you help?`
             : `Hello, I am looking for a specific ${currentCategory}. Can you help?`;
             
-        const whatsappUrl = `https://wa.me/2348161775267?text=${encodeURIComponent(message)}`;
+        const whatsappUrl = `https://wa.me/2348000000000?text=${encodeURIComponent(message)}`;
 
         countLabel.innerText = "No results found";
         grid.innerHTML = `
@@ -85,7 +89,7 @@ function renderLibrary(data) {
                 <div style="font-size: 3rem; margin-bottom: 15px;">🤔</div>
                 <h3 style="font-size: 1.2rem; color: #1e293b; margin-bottom: 10px;">Missing this file?</h3>
                 <p style="color: #64748b; margin-bottom: 25px; max-width: 400px; margin-left: auto; margin-right: auto;">
-                    We don't have <strong>"${currentSearch || 'this file'}"</strong> in our ${currentCategory} archive yet. Request it directly!
+                    We don't have <strong>"${currentSearch}"</strong> in our ${currentCategory} archive yet.
                 </p>
                 <a href="${whatsappUrl}" target="_blank" style="background-color: #2563eb; color: white; padding: 12px 24px; border-radius: 8px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s; box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
@@ -96,6 +100,7 @@ function renderLibrary(data) {
         return;
     }
 
+    // SHOW RESULTS
     countLabel.innerText = `Found ${data.length} ${currentCategory}s`;
 
     data.forEach(file => {
@@ -140,27 +145,58 @@ function renderLibrary(data) {
     });
 }
 
+// --- NEW: EMPTY STATE (Initial Load) ---
+function showEmptyState() {
+    countLabel.innerText = "Start Searching";
+    grid.innerHTML = `
+        <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #64748b;">
+            <div style="font-size: 3rem; margin-bottom: 10px; opacity: 0.5;">🔍</div>
+            <h3 style="font-size: 1.2rem; color: #1e293b; margin-bottom: 5px;">Ready to Explore?</h3>
+            <p>Type a <strong>Course Code</strong> (e.g. MTS 101) or <strong>School</strong> (e.g. SEET) above to find materials.</p>
+        </div>
+    `;
+}
+
 // --- INITIALIZE ---
 document.addEventListener("DOMContentLoaded", () => {
     addSupportButton();
 
     if (searchInput) {
+        // 1. Check for Homepage Click (?school=SEET)
+        const urlParams = new URLSearchParams(window.location.search);
+        const schoolParam = urlParams.get('school');
+
+        if (schoolParam) {
+            // If they clicked a school, fill the search and fetch immediately
+            searchInput.value = schoolParam;
+            currentSearch = schoolParam;
+            fetchMaterials();
+        } else {
+            // Otherwise, just show instructions
+            showEmptyState();
+        }
+
+        // 2. Handle Tab Clicks
         tabButtons.forEach(btn => {
             btn.addEventListener('click', () => {
                 tabButtons.forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
                 currentCategory = btn.dataset.category;
-                fetchMaterials();
+                
+                // Only fetch if they have already typed something
+                // If search is empty, just stay on empty state
+                if (currentSearch) {
+                    fetchMaterials();
+                }
             });
         });
 
+        // 3. Handle Search Typing
         const debouncedSearch = debounce(() => {
             currentSearch = searchInput.value.trim();
             fetchMaterials();
         }, 500);
         searchInput.addEventListener('input', debouncedSearch);
-        
-        fetchMaterials();
     }
 });
 
@@ -196,7 +232,6 @@ function debounce(func, wait) {
     };
 }
 
-// 4. FLOATING BUTTON (No more scroll annoyance!)
 function addSupportButton() {
     const whatsappLink = "https://wa.link/15dowu"; 
     const btn = document.createElement('a');
@@ -205,5 +240,5 @@ function addSupportButton() {
     btn.className = "floating-btn";
     btn.innerHTML = `<span class="support-tooltip">Need Help?</span><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>`;
     document.body.appendChild(btn);
-        }
-                 
+                }
+    
