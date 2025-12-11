@@ -1,24 +1,90 @@
 /* =========================================
-   LIBRARY PAGE STYLES
+   LIBRARY PAGE STYLES (SIMPLIFIED CONCEPT)
    ========================================= */
 .library-header { background-color: var(--bg-white); padding: 130px 20px 40px; border-bottom: 1px solid #e5e7eb; }
 .library-header h1 { font-size: 2.2rem; font-weight: 800; margin-bottom: 10px; }
 .library-header p { color: var(--text-muted); margin-bottom: 30px; }
 
-/* Filter Bar (Desktop) */
-.filter-bar { background: #f8fafc; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0; display: flex; gap: 15px; align-items: center; }
-.search-input { flex: 2; position: relative; } 
-.search-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); opacity: 0.5; }
-.search-input input { width: 100%; padding: 14px 12px 14px 45px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 1rem; outline: none; }
-.filter-group { flex: 1; display: flex; gap: 10px; }
-.filter-group select { flex: 1; padding: 14px; border: 1px solid #cbd5e1; border-radius: 6px; background: white; outline: none; cursor: pointer; }
+/* --- CLEAN SEARCH CONTAINER --- */
+.search-container {
+    max-width: 600px; /* Limits width so it doesn't stretch too far */
+    margin: 30px auto 0;
+}
+
+/* 1. TABS STYLE */
+.tabs-wrapper {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    background: #f8fafc;
+    padding: 5px;
+    border-radius: 50px;
+    border: 1px solid #e2e8f0;
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.tab-btn {
+    padding: 10px 24px;
+    background: transparent;
+    border: none;
+    border-radius: 50px;
+    font-weight: 600;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.95rem;
+}
+
+.tab-btn:hover { color: var(--text-main); }
+
+/* Active Tab (Blue Pill) */
+.tab-btn.active {
+    background-color: white;
+    color: var(--primary);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+/* 2. SEARCH INPUT STYLE */
+.search-input-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.search-input-wrapper input {
+    width: 100%;
+    padding: 16px 16px 16px 50px; /* Left padding for icon */
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    outline: none;
+    transition: 0.2s;
+    background: white;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+}
+
+.search-input-wrapper input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px var(--primary-light);
+}
+
+.search-input-wrapper .search-icon {
+    position: absolute;
+    left: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.2rem;
+    opacity: 0.5;
+}
 
 /* --- Materials Grid --- */
 .library-content { padding: 40px 20px 80px; }
 .results-count { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 20px; font-weight: 600; text-transform: uppercase; display: block; }
 .materials-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 25px; }
 
-/* --- RECTANGULAR CARD DESIGN --- */
+/* --- CARD DESIGN (RECTANGULAR) --- */
 .material-card {
     background: white;
     border-radius: 8px; 
@@ -35,8 +101,7 @@
 .card-header { display: flex; gap: 16px; align-items: flex-start; }
 .file-icon-box {
     width: 50px; height: 50px; background-color: var(--primary); 
-    border-radius: 6px; 
-    display: flex; align-items: center; justify-content: center;
+    border-radius: 6px; display: flex; align-items: center; justify-content: center;
     flex-shrink: 0; color: white; 
 }
 .file-icon-box svg { width: 26px; height: 26px; }
@@ -55,27 +120,10 @@
 }
 .btn-download-full:hover { background-color: var(--primary-dark); }
 
-/* --- Library Mobile Fixes --- */
+/* --- Mobile Fixes --- */
 @media (max-width: 768px) {
     .library-header { padding-top: 100px; }
-    
-    .filter-bar { 
-        flex-direction: column; 
-        align-items: stretch; 
-        padding: 15px; 
-    }
-    .search-input { width: 100%; margin-bottom: 10px; min-width: 0; }
-    
-    /* WRAP DROPDOWNS: School 100%, Others share space */
-    .filter-group { width: 100%; min-width: 0; flex-wrap: wrap; gap: 10px; }
-    
-    .filter-group select { flex: 1 1 100%; }
-    .filter-group select:first-child { flex: 1 1 100%; } /* School */
-    
-    /* The other 3 share space (Level, Sem, Type) */
-    .filter-group select:nth-child(2), 
-    .filter-group select:nth-child(3),
-    .filter-group select:nth-child(4) { flex: 1 1 30%; font-size: 0.85rem; padding: 10px 5px; } 
-    
+    .tabs-wrapper { width: 100%; } /* Tabs take full width */
+    .tab-btn { flex: 1; text-align: center; } /* Even split */
     .materials-grid { grid-template-columns: 1fr; }
 }
