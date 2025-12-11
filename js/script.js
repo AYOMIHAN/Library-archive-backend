@@ -74,7 +74,7 @@ function renderLibrary(data) {
     // 1. HANDLE NO RESULTS
     if (!data || data.length === 0) {
         const userSearch = searchInput.value.trim();
-        const whatsappUrl = "https://wa.link/15dowu"; 
+        const whatsappUrl = "https://wa.link/pjgw21"; 
 
         countLabel.innerText = "No results found";
         
