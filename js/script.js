@@ -57,8 +57,10 @@ async function fetchMaterials() {
     const { data, error } = await query;
 
     if (error) {
-        console.error(error);
+        // Log the actual error to console so you can see it
+        console.error("SUPABASE ERROR:", error.message); 
         countLabel.innerText = "Error loading data.";
+        grid.innerHTML = `<p style="text-align:center; color:red; width:100%;">Database Error: ${error.message}</p>`;
         return;
     }
 
@@ -69,14 +71,13 @@ async function fetchMaterials() {
 function renderLibrary(data) {
     grid.innerHTML = ""; 
 
-    // NO RESULTS - SHOW REQUEST BUTTON (BLUE & RECTANGULAR)
+    // NO RESULTS
     if (!data || data.length === 0) {
         const message = currentSearch 
             ? `Hello, I searched for "${currentSearch}" in ${currentCategory}s but couldn't find it. Can you help?`
             : `Hello, I am looking for a specific ${currentCategory}. Can you help?`;
             
-        // YOUR WHATSAPP NUMBER HERE
-        const whatsappUrl = `https://wa.me/2348000000000?text=${encodeURIComponent(message)}`;
+        const whatsappUrl = `https://wa.me/2348161775267?text=${encodeURIComponent(message)}`;
 
         countLabel.innerText = "No results found";
         grid.innerHTML = `
@@ -139,12 +140,11 @@ function renderLibrary(data) {
     });
 }
 
-// --- INITIALIZE & EVENT LISTENERS ---
+// --- INITIALIZE ---
 document.addEventListener("DOMContentLoaded", () => {
     addSupportButton();
 
     if (searchInput) {
-        // 1. Handle Tab Clicks
         tabButtons.forEach(btn => {
             btn.addEventListener('click', () => {
                 tabButtons.forEach(b => b.classList.remove('active'));
@@ -154,14 +154,12 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         });
 
-        // 2. Handle Search Typing
         const debouncedSearch = debounce(() => {
             currentSearch = searchInput.value.trim();
             fetchMaterials();
         }, 500);
         searchInput.addEventListener('input', debouncedSearch);
         
-        // 3. Initial Load
         fetchMaterials();
     }
 });
@@ -198,6 +196,7 @@ function debounce(func, wait) {
     };
 }
 
+// 4. FLOATING BUTTON (No more scroll annoyance!)
 function addSupportButton() {
     const whatsappLink = "https://wa.link/15dowu"; 
     const btn = document.createElement('a');
@@ -206,12 +205,5 @@ function addSupportButton() {
     btn.className = "floating-btn";
     btn.innerHTML = `<span class="support-tooltip">Need Help?</span><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>`;
     document.body.appendChild(btn);
-    let scrollTimeout;
-    const tooltip = btn.querySelector('.support-tooltip');
-    window.addEventListener('scroll', () => {
-        tooltip.classList.add('show');
-        clearTimeout(scrollTimeout);
-        scrollTimeout = setTimeout(() => { tooltip.classList.remove('show'); }, 3000);
-    });
-                    }
-
+        }
+                 
