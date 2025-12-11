@@ -18,11 +18,15 @@ if (hamburger) {
     });
 }
 
-// 2. SUPABASE CONFIGURATION
+// 2. CONFIGURATION (Supabase & Cloudflare)
 const SUPABASE_URL = 'https://tfjxfmjcmynwwhslzvdy.supabase.co'; 
 const SUPABASE_KEY = 'sb_publishable_cEjENOV9eLIWWl9KshKojQ_jTnwFhoa'; 
 
+// YOUR CLOUDFLARE LINK GOES HERE:
+const STORAGE_URL = 'https://pub-0f85cb90209746ab99254cee3df8fdbc.r2.dev'; 
+
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
 
 // 3. LIBRARY LOGIC
 const grid = document.getElementById('library-grid');
@@ -63,24 +67,15 @@ async function fetchMaterials() {
     renderLibrary(data);
 }
 
-// --- RENDER FUNCTION (With Dynamic WhatsApp Link) ---
+// --- RENDER FUNCTION ---
 function renderLibrary(data) {
     grid.innerHTML = ""; 
 
-    // 1. HANDLE NO RESULTS (Dynamic Request)
+    // 1. HANDLE NO RESULTS
     if (!data || data.length === 0) {
         const userSearch = searchInput.value.trim();
-        
-        // --- DYNAMIC LINK LOGIC ---
-        // 1. Create the specific message
-        const message = userSearch 
-            ? `Hello, I searched for "${userSearch}" on the e-Library but couldn't find it. Can you help me get it?`
-            : `Hello, I am looking for a specific course material on the e-Library. Can you help?`;
-            
-        // 2. Encode it for URL (turns spaces into %20)
-        // TODO: REPLACE '2348000000000' WITH YOUR ACTUAL WHATSAPP NUMBER
-        const whatsappUrl = `https://wa.me/2349167732534?text=${encodeURIComponent(message)}`;
-        
+        const whatsappUrl = "https://wa.link/15dowu"; 
+
         countLabel.innerText = "No results found";
         
         grid.innerHTML = `
@@ -111,6 +106,14 @@ function renderLibrary(data) {
         const iconStyle = !isPdf ? 'background-color:#dbeafe; color:#2563eb;' : '';
         const iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>`;
 
+        // --- SMART URL LOGIC ---
+        // If the database has a full link (http...), use it.
+        // If it only has a filename (e.g. 'math.pdf'), combine it with STORAGE_URL.
+        let finalDownloadUrl = file.download_url;
+        if (!finalDownloadUrl.startsWith('http')) {
+            finalDownloadUrl = `${STORAGE_URL}/${finalDownloadUrl}`;
+        }
+
         card.innerHTML = `
             <div class="card-header">
                 <div class="${iconClass}" style="${iconStyle}">
@@ -128,7 +131,7 @@ function renderLibrary(data) {
                 <div class="visible-meta">${file.level}L • ${file.semester} Sem • ${file.file_size}</div>
             </div>
             <div class="card-footer">
-                <button class="btn-download-full" onclick="startDownload('${file.download_url}', this)">
+                <button class="btn-download-full" onclick="startDownload('${finalDownloadUrl}', this)">
                     Download ${file.file_type}
                 </button>
             </div>
@@ -140,20 +143,23 @@ function renderLibrary(data) {
 // --- DOWNLOAD LOGIC ---
 function startDownload(url, btnElement) {
     const originalText = btnElement.innerText;
-    let timeLeft = 5; 
+    let timeLeft = 3; // Reduced to 3s for snappier feel
+    
     btnElement.disabled = true; 
     btnElement.style.backgroundColor = "#94a3b8"; 
     btnElement.style.cursor = "wait";
-    btnElement.innerText = `Generating Link (${timeLeft}s)...`;
+    btnElement.innerText = `Fetching File (${timeLeft}s)...`;
 
     const timer = setInterval(() => {
         timeLeft--;
-        btnElement.innerText = `Generating Link (${timeLeft}s)...`;
+        btnElement.innerText = `Fetching File (${timeLeft}s)...`;
 
         if (timeLeft <= 0) {
             clearInterval(timer);
             btnElement.style.backgroundColor = "#22c55e"; 
-            btnElement.innerText = "Download Started! 🚀";
+            btnElement.innerText = "Opening File... 🚀";
+            
+            // Open Cloudflare Link
             window.open(url, '_blank');
 
             setTimeout(() => {
@@ -202,7 +208,7 @@ function debounce(func, wait) {
     };
 }
 
-// 4. FLOATING BUTTON (Standard Support Link)
+// 4. FLOATING BUTTON
 function addSupportButton() {
     const whatsappLink = "https://wa.link/15dowu"; 
     const btn = document.createElement('a');
@@ -218,4 +224,5 @@ function addSupportButton() {
         clearTimeout(scrollTimeout);
         scrollTimeout = setTimeout(() => { tooltip.classList.remove('show'); }, 3000);
     });
-}
+                    }
+            
