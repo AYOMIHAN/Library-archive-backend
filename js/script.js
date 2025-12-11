@@ -28,14 +28,14 @@ const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 // 3. LIBRARY LOGIC
 const grid = document.getElementById('library-grid');
 const countLabel = document.getElementById('result-count');
-const searchInput = document.getElementById('main-search'); // Changed ID
+const searchInput = document.getElementById('main-search'); 
 const tabButtons = document.querySelectorAll('.tab-btn');
 
 // State Variables
 let currentCategory = "Handout"; // Default Tab
 let currentSearch = "";
 
-// --- FETCH FUNCTION (Simplified) ---
+// --- FETCH FUNCTION ---
 async function fetchMaterials() {
     if (!grid) return;
 
@@ -69,12 +69,13 @@ async function fetchMaterials() {
 function renderLibrary(data) {
     grid.innerHTML = ""; 
 
-    // NO RESULTS - SHOW REQUEST BUTTON
+    // NO RESULTS - SHOW REQUEST BUTTON (BLUE & RECTANGULAR)
     if (!data || data.length === 0) {
         const message = currentSearch 
             ? `Hello, I searched for "${currentSearch}" in ${currentCategory}s but couldn't find it. Can you help?`
             : `Hello, I am looking for a specific ${currentCategory}. Can you help?`;
             
+        // YOUR WHATSAPP NUMBER HERE
         const whatsappUrl = `https://wa.me/2348000000000?text=${encodeURIComponent(message)}`;
 
         countLabel.innerText = "No results found";
@@ -146,10 +147,8 @@ document.addEventListener("DOMContentLoaded", () => {
         // 1. Handle Tab Clicks
         tabButtons.forEach(btn => {
             btn.addEventListener('click', () => {
-                // UI Toggle
                 tabButtons.forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
-                // State Update
                 currentCategory = btn.dataset.category;
                 fetchMaterials();
             });
@@ -214,4 +213,5 @@ function addSupportButton() {
         clearTimeout(scrollTimeout);
         scrollTimeout = setTimeout(() => { tooltip.classList.remove('show'); }, 3000);
     });
-}
+                    }
+
