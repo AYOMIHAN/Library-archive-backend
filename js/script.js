@@ -30,20 +30,27 @@ const countLabel = document.getElementById('result-count');
 const searchInput = document.querySelector('.search-input input');
 const filterSelects = document.querySelectorAll('.filter-group select');
 
-// --- FETCH FUNCTION ---
+// --- FETCH FUNCTION (Database) ---
 async function fetchMaterials() {
     if (!grid) return;
 
+    // Loading State
     countLabel.innerText = "Searching database...";
     grid.innerHTML = '<p style="text-align:center; color:#6b7280; width:100%; margin-top:20px;">Loading materials...</p>';
 
+    // Get Inputs
     const searchTerm = searchInput.value.trim();
     const schoolFilter = filterSelects[0].value;
     const levelFilter = filterSelects[1].value;
     const semFilter = filterSelects[2].value;
 
-    let query = supabase.from('materials').select('*').limit(50);
+    // Build Query
+    let query = supabase
+        .from('materials') 
+        .select('*')
+        .limit(50); // Optimization
 
+    // Apply Filters
     if (searchTerm) {
         query = query.or(`title.ilike.%${searchTerm}%,course_code.ilike.%${searchTerm}%`);
     }
@@ -51,27 +58,50 @@ async function fetchMaterials() {
     if (levelFilter) { query = query.eq('level', levelFilter); }
     if (semFilter) { query = query.eq('semester', semFilter); }
 
+    // Run Query
     const { data, error } = await query;
 
     if (error) {
         console.error('Error fetching data:', error);
         countLabel.innerText = "Error loading data.";
+        grid.innerHTML = '<p style="text-align:center; color:red; width:100%;">Database Error. Check console.</p>';
         return;
     }
 
     renderLibrary(data);
 }
 
-// --- RENDER FUNCTION (UPDATED FOR COUNTDOWN) ---
+// --- RENDER FUNCTION (With "Request Material" Logic) ---
 function renderLibrary(data) {
     grid.innerHTML = ""; 
 
+    // 1. HANDLE NO RESULTS (Show Request Card)
     if (!data || data.length === 0) {
+        const userSearch = searchInput.value.trim();
+        
+        // Use your specific WA Link
+        const whatsappUrl = "https://wa.link/15dowu";
+
         countLabel.innerText = "No results found";
-        grid.innerHTML = '<p style="text-align:center; color:#6b7280; width:100%; margin-top:20px;">No materials match your search.</p>';
+        
+        // Inject the Request Card
+        grid.innerHTML = `
+            <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; background: white; border-radius: 12px; border: 1px dashed #cbd5e1;">
+                <div style="font-size: 3rem; margin-bottom: 15px;">🤔</div>
+                <h3 style="font-size: 1.2rem; color: #1e293b; margin-bottom: 10px;">Couldn't find what you're looking for?</h3>
+                <p style="color: #64748b; margin-bottom: 25px; max-width: 400px; margin-left: auto; margin-right: auto;">
+                    We are constantly updating our database. Request <strong>"${userSearch || 'this material'}"</strong> directly, and we will try to find it for you.
+                </p>
+                <a href="${whatsappUrl}" target="_blank" style="background-color: #22c55e; color: white; padding: 12px 24px; border-radius: 50px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                    Request via WhatsApp
+                </a>
+            </div>
+        `;
         return;
     }
 
+    // 2. SHOW RESULTS (Standard Cards)
     countLabel.innerText = `Showing ${data.length} Results`;
 
     data.forEach(file => {
@@ -80,6 +110,7 @@ function renderLibrary(data) {
 
         const isPdf = file.file_type === 'PDF';
         const iconClass = isPdf ? "file-icon-box" : "file-icon-box doc-theme";
+        // Check for DOC style override if needed (assuming logic from previous steps)
         const iconStyle = !isPdf ? 'background-color:#dbeafe; color:#2563eb;' : '';
         const iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>`;
 
@@ -109,51 +140,43 @@ function renderLibrary(data) {
     });
 }
 
-// --- NEW: COUNTDOWN LOGIC ---
+// --- COUNTDOWN DOWNLOAD LOGIC ---
 function startDownload(url, btnElement) {
-    // 1. Save original text so we can put it back later
     const originalText = btnElement.innerText;
+    let timeLeft = 5; 
     
-    // 2. Initial State
-    let timeLeft = 5; // Seconds to wait
-    btnElement.disabled = true; // Disable clicking
-    btnElement.style.backgroundColor = "#94a3b8"; // Turn grey
+    btnElement.disabled = true; 
+    btnElement.style.backgroundColor = "#94a3b8"; 
     btnElement.style.cursor = "wait";
     btnElement.innerText = `Generating Link (${timeLeft}s)...`;
 
-    // 3. Start Timer
     const timer = setInterval(() => {
         timeLeft--;
         btnElement.innerText = `Generating Link (${timeLeft}s)...`;
 
-        // 4. Time's Up!
         if (timeLeft <= 0) {
             clearInterval(timer);
-            
-            // Show success
-            btnElement.style.backgroundColor = "#22c55e"; // Green color
+            btnElement.style.backgroundColor = "#22c55e"; 
             btnElement.innerText = "Download Started! 🚀";
             
-            // Open the link (The actual download)
             window.open(url, '_blank');
 
-            // 5. Reset Button after 3 seconds
             setTimeout(() => {
                 btnElement.innerText = originalText;
                 btnElement.disabled = false;
-                btnElement.style.backgroundColor = ""; // Reset to CSS default (Blue)
+                btnElement.style.backgroundColor = ""; 
                 btnElement.style.cursor = "pointer";
             }, 3000);
         }
     }, 1000);
 }
 
-// --- INITIALIZE ---
+// --- INITIALIZE & URL PARSING ---
 document.addEventListener("DOMContentLoaded", () => {
     addSupportButton();
 
     if (searchInput) {
-        // Check for URL params
+        // Check URL Params (e.g. from Home Page Click)
         const urlParams = new URLSearchParams(window.location.search);
         const schoolParam = urlParams.get('school');
 
@@ -161,7 +184,7 @@ document.addEventListener("DOMContentLoaded", () => {
             filterSelects[0].value = schoolParam;
             fetchMaterials();
         } else {
-            // Show instructions
+            // Empty State (Instructions)
             countLabel.innerText = "Start Searching";
             grid.innerHTML = `
                 <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #64748b;">
@@ -172,7 +195,7 @@ document.addEventListener("DOMContentLoaded", () => {
             `;
         }
 
-        // Listeners
+        // Search Listeners with Debounce
         const debouncedSearch = debounce(() => fetchMaterials(), 500);
         searchInput.addEventListener('input', debouncedSearch);
         filterSelects.forEach(select => select.addEventListener('change', fetchMaterials));
@@ -190,12 +213,19 @@ function debounce(func, wait) {
 // 4. FLOATING BUTTON
 function addSupportButton() {
     const whatsappLink = "https://wa.link/15dowu"; 
+    
     const btn = document.createElement('a');
     btn.href = whatsappLink;
     btn.target = "_blank";
     btn.className = "floating-btn";
-    btn.innerHTML = `<span class="support-tooltip">Need Help?</span><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>`;
+    btn.innerHTML = `
+        <span class="support-tooltip">Need Help?</span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+        </svg>
+    `;
     document.body.appendChild(btn);
+
     let scrollTimeout;
     const tooltip = btn.querySelector('.support-tooltip');
     window.addEventListener('scroll', () => {
@@ -203,5 +233,5 @@ function addSupportButton() {
         clearTimeout(scrollTimeout);
         scrollTimeout = setTimeout(() => { tooltip.classList.remove('show'); }, 3000);
     });
-        }
-        
+                 }
+                       
