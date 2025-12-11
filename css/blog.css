@@ -1,27 +1,18 @@
 /* =========================================
-   BLOG: APPLE NEWSROOM STYLE
+   BLOG: APPLE NEWSROOM STYLE (Corrected)
    ========================================= */
 
 body { background-color: #ffffff; color: #1d1d1f; }
 
-/* SUBNAV (The "Newsroom" Bar) */
-.newsroom-subnav {
-    position: sticky; top: 70px; z-index: 900;
-    background: rgba(255, 255, 255, 0.95);
-    border-bottom: 1px solid #d2d2d7;
-    backdrop-filter: blur(10px);
-    padding: 16px 0;
-}
-.subnav-content { display: flex; align-items: center; justify-content: space-between; }
-.newsroom-brand { font-size: 1.3rem; font-weight: 700; color: #1d1d1f; letter-spacing: -0.5px; }
-.subnav-links { display: flex; gap: 24px; }
-.subnav-links a { font-size: 0.85rem; color: #424245; font-weight: 500; text-decoration: none; transition: 0.2s; }
-.subnav-links a:hover, .subnav-links a.active { color: #1d1d1f; }
-
-
 /* MAIN SECTION */
-.news-feed { padding: 60px 0 100px; }
+.news-feed { padding: 120px 0 100px; } /* Added padding-top for fixed navbar */
 
+.page-title {
+    font-size: 3rem;
+    font-weight: 800;
+    margin-bottom: 50px;
+    letter-spacing: -1px;
+}
 
 /* --- HERO STORY --- */
 .hero-story {
@@ -29,19 +20,27 @@ body { background-color: #ffffff; color: #1d1d1f; }
     margin-bottom: 80px;
     text-decoration: none;
     color: inherit;
-    group: hover; /* Trigger for hover effects */
+    group: hover; 
 }
 
 .hero-img-wrapper {
     width: 100%; height: 500px;
-    border-radius: 12px; /* Subtle Apple curve */
-    background: #000;
-    display: flex; align-items: center; justify-content: center;
+    border-radius: 12px;
+    background: #f5f5f7;
     margin-bottom: 30px;
-    overflow: hidden;
+    overflow: hidden; /* Ensures image stays inside corners */
 }
-/* Subtle Zoom Effect on Hover */
-.hero-story:hover .hero-img-wrapper span { transform: scale(1.1); transition: 0.4s ease; }
+
+/* IMAGE HANDLING */
+.hero-img-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* This makes the image fill the box perfectly */
+    transition: transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+/* Zoom Effect on Hover */
+.hero-story:hover .hero-img-wrapper img { transform: scale(1.03); }
 
 .hero-text { max-width: 800px; }
 .hero-text h2 { font-size: 2.8rem; font-weight: 700; line-height: 1.08; letter-spacing: -0.015em; color: #1d1d1f; margin-top: 10px; }
@@ -69,11 +68,18 @@ body { background-color: #ffffff; color: #1d1d1f; }
     aspect-ratio: 16/10; /* Classic rectangular ratio */
     border-radius: 12px;
     background: #f5f5f7;
-    display: flex; align-items: center; justify-content: center;
+    overflow: hidden; /* Hide overflow for zoom effect */
     margin-bottom: 20px;
-    transition: 0.3s;
 }
-.news-card:hover .card-image { box-shadow: 0 10px 30px rgba(0,0,0,0.1); transform: translateY(-3px); }
+
+.card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+}
+
+.news-card:hover .card-image img { transform: scale(1.05); }
 
 .card-content h3 { font-size: 1.5rem; font-weight: 700; line-height: 1.2; color: #1d1d1f; margin-top: 8px; }
 .news-card:hover h3 { color: var(--primary); }
@@ -90,8 +96,8 @@ body { background-color: #ffffff; color: #1d1d1f; }
 
 /* RESPONSIVE */
 @media (max-width: 768px) {
+    .news-feed { padding-top: 100px; }
     .hero-img-wrapper { height: 300px; }
     .hero-text h2 { font-size: 2rem; }
     .news-grid { grid-template-columns: 1fr; } /* 1 Column on mobile */
-    .subnav-links { display: none; } /* Hide subnav links on small screens */
 }
