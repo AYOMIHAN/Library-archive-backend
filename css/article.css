@@ -1,0 +1,145 @@
+/* =========================================
+   ARTICLE READING PAGE STYLE
+   ========================================= */
+
+body { background-color: #ffffff; color: #1d1d1f; }
+
+/* Main Container: Narrower for reading comfort */
+.article-page {
+    max-width: 740px; /* The "Golden Width" for reading */
+    margin: 0 auto;
+    padding: 120px 20px 60px;
+}
+
+/* Breadcrumb */
+.breadcrumb { margin-bottom: 30px; }
+.breadcrumb a { 
+    color: #64748b; font-weight: 600; font-size: 0.9rem; text-decoration: none; 
+}
+.breadcrumb a:hover { color: var(--primary); }
+
+/* Header */
+.article-header { margin-bottom: 30px; text-align: left; }
+
+.article-tag {
+    display: inline-block;
+    background: #eff6ff;
+    color: var(--primary);
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 6px 12px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    letter-spacing: 0.5px;
+}
+
+.article-header h1 {
+    font-size: 2.5rem; /* Big Title */
+    line-height: 1.15;
+    font-weight: 800;
+    color: #111827;
+    margin-bottom: 15px;
+    letter-spacing: -0.02em;
+}
+
+.article-meta {
+    font-size: 0.95rem;
+    color: #64748b;
+    font-weight: 500;
+}
+.dot { margin: 0 8px; color: #cbd5e1; }
+
+/* Hero Image */
+.article-hero-img {
+    margin: 0 0 40px 0;
+    width: 100%;
+}
+.article-hero-img img {
+    width: 100%;
+    height: auto;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+.article-hero-img figcaption {
+    font-size: 0.85rem; color: #94a3b8; margin-top: 10px; text-align: center;
+}
+
+/* --- THE CONTENT (Typography) --- */
+.article-content {
+    font-size: 1.125rem; /* 18px - Great for reading */
+    line-height: 1.7;    /* Space between lines */
+    color: #334155;      /* Dark Grey (Not pure black) */
+}
+
+/* Paragraphs */
+.article-content p { margin-bottom: 24px; }
+
+/* The first paragraph (Lead) */
+.lead-text {
+    font-size: 1.25rem;
+    font-weight: 400;
+    color: #1e293b;
+    line-height: 1.6;
+}
+
+/* Headings inside article */
+.article-content h2 {
+    font-size: 1.8rem; font-weight: 700; color: #111827;
+    margin-top: 50px; margin-bottom: 15px; letter-spacing: -0.01em;
+}
+
+.article-content h3 {
+    font-size: 1.4rem; font-weight: 600; color: #1e293b;
+    margin-top: 30px; margin-bottom: 10px;
+}
+
+/* Blockquote */
+.article-content blockquote {
+    margin: 40px 0;
+    padding: 20px 30px;
+    background: #f8fafc;
+    border-left: 4px solid var(--primary);
+    font-style: italic;
+    font-size: 1.2rem;
+    color: #475569;
+    border-radius: 0 8px 8px 0;
+}
+
+/* Lists */
+.article-content ul { margin-bottom: 24px; padding-left: 20px; }
+.article-content li { margin-bottom: 10px; padding-left: 10px; }
+
+/* Links inside text */
+.article-content a { color: var(--primary); text-decoration: underline; text-decoration-thickness: 2px; }
+.article-content a:hover { color: var(--primary-dark); }
+
+/* Divider & Share */
+.divider { border: 0; border-top: 1px solid #e2e8f0; margin: 50px 0 30px; }
+.share-box { font-weight: 600; color: #111827; }
+.share-box a { color: var(--primary); text-decoration: none; margin-left: 10px; cursor: pointer; }
+
+/* --- READ NEXT SECTION --- */
+.read-next {
+    background: #f8fafc;
+    padding: 60px 20px;
+    border-top: 1px solid #e2e8f0;
+    margin-top: 40px;
+}
+.read-next h3 { font-size: 1.1rem; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 30px; }
+
+.next-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 30px; max-width: 900px; margin: 0 auto;
+}
+.next-card { text-decoration: none; color: inherit; display: flex; align-items: center; gap: 20px; transition: 0.2s; background: white; padding: 15px; border-radius: 12px; border: 1px solid #e2e8f0; }
+.next-card:hover { border-color: var(--primary); transform: translateY(-3px); }
+
+.next-img { width: 80px; height: 80px; border-radius: 8px; overflow: hidden; flex-shrink: 0; }
+.next-img img { width: 100%; height: 100%; object-fit: cover; }
+.next-card h4 { font-size: 1rem; font-weight: 700; line-height: 1.4; }
+
+/* Mobile */
+@media (max-width: 768px) {
+    .article-header h1 { font-size: 2rem; }
+    .next-grid { grid-template-columns: 1fr; }
+}
