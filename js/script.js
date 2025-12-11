@@ -63,18 +63,26 @@ async function fetchMaterials() {
     renderLibrary(data);
 }
 
-// --- RENDER FUNCTION (With Blue Rectangular Request Button) ---
+// --- RENDER FUNCTION (With Dynamic WhatsApp Link) ---
 function renderLibrary(data) {
     grid.innerHTML = ""; 
 
-    // 1. HANDLE NO RESULTS
+    // 1. HANDLE NO RESULTS (Dynamic Request)
     if (!data || data.length === 0) {
         const userSearch = searchInput.value.trim();
-        const whatsappUrl = "https://wa.link/15dowu"; // Your Link
-
+        
+        // --- DYNAMIC LINK LOGIC ---
+        // 1. Create the specific message
+        const message = userSearch 
+            ? `Hello, I searched for "${userSearch}" on the e-Library but couldn't find it. Can you help me get it?`
+            : `Hello, I am looking for a specific course material on the e-Library. Can you help?`;
+            
+        // 2. Encode it for URL (turns spaces into %20)
+        // TODO: REPLACE '2348000000000' WITH YOUR ACTUAL WHATSAPP NUMBER
+        const whatsappUrl = `https://wa.me/2349167732534?text=${encodeURIComponent(message)}`;
+        
         countLabel.innerText = "No results found";
         
-        // Inject Request Card
         grid.innerHTML = `
             <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; background: white; border-radius: 8px; border: 1px dashed #cbd5e1;">
                 <div style="font-size: 3rem; margin-bottom: 15px;">🤔</div>
@@ -129,11 +137,10 @@ function renderLibrary(data) {
     });
 }
 
-// --- COUNTDOWN DOWNLOAD LOGIC ---
+// --- DOWNLOAD LOGIC ---
 function startDownload(url, btnElement) {
     const originalText = btnElement.innerText;
     let timeLeft = 5; 
-    
     btnElement.disabled = true; 
     btnElement.style.backgroundColor = "#94a3b8"; 
     btnElement.style.cursor = "wait";
@@ -147,7 +154,6 @@ function startDownload(url, btnElement) {
             clearInterval(timer);
             btnElement.style.backgroundColor = "#22c55e"; 
             btnElement.innerText = "Download Started! 🚀";
-            
             window.open(url, '_blank');
 
             setTimeout(() => {
@@ -196,7 +202,7 @@ function debounce(func, wait) {
     };
 }
 
-// 4. FLOATING BUTTON
+// 4. FLOATING BUTTON (Standard Support Link)
 function addSupportButton() {
     const whatsappLink = "https://wa.link/15dowu"; 
     const btn = document.createElement('a');
@@ -212,5 +218,4 @@ function addSupportButton() {
         clearTimeout(scrollTimeout);
         scrollTimeout = setTimeout(() => { tooltip.classList.remove('show'); }, 3000);
     });
-    }
-    
+}
