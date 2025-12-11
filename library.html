@@ -45,53 +45,27 @@
     <section class="library-header">
         <div class="container">
             <h1>Library Archive</h1>
-            <p>Search by course code or filter by department.</p>
+            <p>Select a category and search by course code.</p>
             
-            <div class="filter-bar">
-                <div class="search-input">
-                    <span class="search-icon">🔍</span>
-                    <input type="text" placeholder="Search course (e.g. MTS 101)...">
-                </div>
+            <div class="search-container">
                 
-                <div class="filter-group">
-                    <select>
-                        <option value="">All Schools</option>
-                        <option value="SEET">SEET</option>
-                        <option value="SAAT">SAAT</option>
-                        <option value="SOS">SOS</option>
-                        <option value="SET">SET</option>
-                        <option value="SOC">SOC</option>
-                        <option value="GNS">GNS</option>
-                    </select>
-                    
-                    <select>
-                        <option value="">Level</option>
-                        <option value="100">100 L</option>
-                        <option value="200">200 L</option>
-                        <option value="300">300 L</option>
-                        <option value="400">400 L</option>
-                        <option value="500">500 L</option>
-                    </select>
-
-                    <select>
-                        <option value="">Sem</option>
-                        <option value="1st">1st Sem</option>
-                        <option value="2nd">2nd Sem</option>
-                    </select>
-
-                    <select>
-                        <option value="">Type</option>
-                        <option value="Handout">Handouts</option>
-                        <option value="Past Question">Past Questions</option>
-                    </select>
+                <div class="tabs-wrapper">
+                    <button class="tab-btn active" data-category="Handout">Handouts</button>
+                    <button class="tab-btn" data-category="Past Question">Past Questions</button>
                 </div>
+
+                <div class="search-input-wrapper">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="main-search" placeholder="Enter course code (e.g. MTS 101)...">
+                </div>
+
             </div>
         </div>
     </section>
 
     <section class="library-content">
         <div class="container">
-            <h3 class="results-count" id="result-count">Connecting to database...</h3>
+            <h3 class="results-count" id="result-count">Connecting...</h3>
             <div class="materials-grid" id="library-grid">
                 </div>
         </div>
@@ -112,12 +86,10 @@
                 </ul>
             </div>
             <div class="footer-col">
-                <h3>Support & Legal</h3>
+                <h3>Support</h3>
                 <ul class="footer-links">
-                    <li><a href="#">About Us</a></li>
                     <li><a href="#">Contact</a></li>
-                    <li><a href="#">Privacy Policy</a></li>
-                    <li><a href="#">Terms of Use</a></li>
+                    <li><a href="#">Terms</a></li>
                 </ul>
             </div>
         </div>
@@ -129,4 +101,3 @@
     <script src="js/script.js"></script>
 </body>
 </html>
-    
