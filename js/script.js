@@ -1,4 +1,4 @@
-// 1. HAMBURGER MENU LOGIC
+// 1. HAMBURGER MENU
 const hamburger = document.getElementById('hamburger');
 const mobileNav = document.getElementById('mobileNav');
 const bars = document.querySelectorAll('.bar');
@@ -18,15 +18,14 @@ if (hamburger) {
     });
 }
 
-// 2. CONFIGURATION (Supabase & Cloudflare)
+// 2. SUPABASE & CLOUDFLARE CONFIG
 const SUPABASE_URL = 'https://tfjxfmjcmynwwhslzvdy.supabase.co'; 
 const SUPABASE_KEY = 'sb_publishable_cEjENOV9eLIWWl9KshKojQ_jTnwFhoa'; 
 
-// YOUR CLOUDFLARE LINK GOES HERE:
+// REPLACE WITH YOUR ACTUAL CLOUDFLARE R2 URL
 const STORAGE_URL = 'https://pub-0f85cb90209746ab99254cee3df8fdbc.r2.dev'; 
 
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
 
 // 3. LIBRARY LOGIC
 const grid = document.getElementById('library-grid');
@@ -45,6 +44,7 @@ async function fetchMaterials() {
     const schoolFilter = filterSelects[0].value;
     const levelFilter = filterSelects[1].value;
     const semFilter = filterSelects[2].value;
+    const typeFilter = filterSelects[3].value; // NEW: Category Filter
 
     let query = supabase.from('materials').select('*').limit(50);
 
@@ -54,6 +54,9 @@ async function fetchMaterials() {
     if (schoolFilter) { query = query.eq('school', schoolFilter); }
     if (levelFilter) { query = query.eq('level', levelFilter); }
     if (semFilter) { query = query.eq('semester', semFilter); }
+    
+    // NEW: Filter by Category
+    if (typeFilter) { query = query.eq('category', typeFilter); }
 
     const { data, error } = await query;
 
@@ -71,10 +74,15 @@ async function fetchMaterials() {
 function renderLibrary(data) {
     grid.innerHTML = ""; 
 
-    // 1. HANDLE NO RESULTS
+    // NO RESULTS
     if (!data || data.length === 0) {
         const userSearch = searchInput.value.trim();
-        const whatsappUrl = "https://wa.link/pjgw21"; 
+        const message = userSearch 
+            ? `Hello, I searched for "${userSearch}" on the e-Library but couldn't find it. Can you help me get it?`
+            : `Hello, I am looking for a specific course material on the e-Library. Can you help?`;
+            
+        // REPLACE WITH YOUR PHONE NUMBER
+        const whatsappUrl = `https://wa.me/2348000000000?text=${encodeURIComponent(message)}`;
 
         countLabel.innerText = "No results found";
         
@@ -94,7 +102,7 @@ function renderLibrary(data) {
         return;
     }
 
-    // 2. SHOW RESULTS
+    // SHOW RESULTS
     countLabel.innerText = `Showing ${data.length} Results`;
 
     data.forEach(file => {
@@ -106,9 +114,12 @@ function renderLibrary(data) {
         const iconStyle = !isPdf ? 'background-color:#dbeafe; color:#2563eb;' : '';
         const iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>`;
 
-        // --- SMART URL LOGIC ---
-        // If the database has a full link (http...), use it.
-        // If it only has a filename (e.g. 'math.pdf'), combine it with STORAGE_URL.
+        // NEW: Badge Logic (Orange for PQ, Green for Handout)
+        const badgeColor = file.category === 'Past Question' 
+            ? 'background-color:#fff7ed; color:#c2410c; border:1px solid #ffedd5;' 
+            : 'background-color:#f0fdf4; color:#15803d; border:1px solid #dcfce7;';
+
+        // URL LOGIC
         let finalDownloadUrl = file.download_url;
         if (!finalDownloadUrl.startsWith('http')) {
             finalDownloadUrl = `${STORAGE_URL}/${finalDownloadUrl}`;
@@ -123,6 +134,9 @@ function renderLibrary(data) {
                     <h3>${file.title}</h3>
                     <div class="meta-row">
                         <span class="course-code">${file.course_code}</span>
+                        <span style="font-size:0.7rem; font-weight:600; padding:2px 6px; border-radius:4px; margin-left:8px; ${badgeColor}">
+                            ${file.category || 'Handout'}
+                        </span>
                     </div>
                 </div>
             </div>
@@ -140,10 +154,10 @@ function renderLibrary(data) {
     });
 }
 
-// --- DOWNLOAD LOGIC ---
+// --- COUNTDOWN DOWNLOAD LOGIC ---
 function startDownload(url, btnElement) {
     const originalText = btnElement.innerText;
-    let timeLeft = 3; // Reduced to 3s for snappier feel
+    let timeLeft = 3; 
     
     btnElement.disabled = true; 
     btnElement.style.backgroundColor = "#94a3b8"; 
@@ -159,7 +173,6 @@ function startDownload(url, btnElement) {
             btnElement.style.backgroundColor = "#22c55e"; 
             btnElement.innerText = "Opening File... 🚀";
             
-            // Open Cloudflare Link
             window.open(url, '_blank');
 
             setTimeout(() => {
@@ -224,5 +237,4 @@ function addSupportButton() {
         clearTimeout(scrollTimeout);
         scrollTimeout = setTimeout(() => { tooltip.classList.remove('show'); }, 3000);
     });
-                    }
-            
+}
