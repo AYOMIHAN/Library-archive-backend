@@ -9,8 +9,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/library.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="library.css">
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -39,7 +39,7 @@
         <a href="library.html">Library</a>
         <a href="blog.html">Blogs</a>
         <a href="about.html">About</a>
-        <a href="contact.html">Contact Us</a>
+        <a href="contact.html">Contact</a>
     </div>
 
     <section class="library-header">
@@ -63,7 +63,16 @@
         </div>
     </section>
 
-<footer class="site-footer">
+    <section class="library-content">
+        <div class="container">
+            <h3 class="results-count" id="result-count">Connecting...</h3>
+            
+            <div class="materials-grid" id="library-grid">
+                </div>
+        </div>
+    </section>
+
+    <footer class="site-footer">
         <div class="footer-grid">
             <div class="footer-col">
                 <div class="logo footer-logo">Campus<span>e-Library</span></div>
@@ -76,16 +85,16 @@
                     <li><a href="index.html">Home</a></li>
                     <li><a href="library.html">Library</a></li>
                     <li><a href="blog.html">Blogs</a></li>
+                    <li><a href="about.html">About</a></li>
                 </ul>
             </div>
             
             <div class="footer-col">
                 <h3>Support & Legal</h3>
                 <ul class="footer-links">
-                    <li><a href="about.html">About Us</a></li>
-                    <li><a href="contact.html">Contact</a></li>
-                    <li><a href="policy.html">Privacy Policy</a></li>
-                    <li><a href="terms.html">Terms of Use</a></li>
+                    <li><a href="contact.html">Contact Us</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms of Use</a></li>
                 </ul>
             </div>
         </div>
@@ -95,8 +104,6 @@
         </div>
     </footer>
 
-    <script src="js/script.js"></script>
+    <script src="script.js"></script>
 </body>
-    </html>
-
-    
+</html>
