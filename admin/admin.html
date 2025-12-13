@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Campus e-Library</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <link rel="stylesheet" href="css/admin.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <script src="js/admin.js" defer></script>
+</head>
+<body>
+
+    <div class="dashboard-container">
+        
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>Campus<span>Library</span></h2>
+            </div>
+            <ul class="nav-links">
+                <li class="active" onclick="switchTab('overview', this)">
+                    <a href="#"><i class="ph ph-squares-four"></i> Overview</a>
+                </li>
+                <li onclick="switchTab('materials', this)">
+                    <a href="#"><i class="ph ph-files"></i> Materials</a>
+                </li>
+                <li onclick="switchTab('blogs', this)">
+                    <a href="#"><i class="ph ph-article"></i> Blog Posts</a>
+                </li>
+                <li class="spacer"></li>
+                <li>
+                    <a href="#" onclick="logout()" class="logout-link"><i class="ph ph-sign-out"></i> Logout</a>
+                </li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            
+            <header class="top-bar">
+                <div class="breadcrumbs">
+                    <h1 id="page-title">Overview</h1>
+                    <p id="page-desc">Welcome back, Admin.</p>
+                </div>
+                <div class="user-profile">
+                    <div class="avatar">A</div>
+                    <span>Admin</span>
+                </div>
+            </header>
+
+            <div id="view-overview" class="view-section active">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="icon-box blue"><i class="ph ph-files"></i></div>
+                        <div class="stat-info"><h3 id="stat-files">...</h3><span>Total Files</span></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="icon-box green"><i class="ph ph-download-simple"></i></div>
+                        <div class="stat-info"><h3 id="stat-downloads">...</h3><span>Total Downloads</span></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="icon-box orange"><i class="ph ph-article-medium"></i></div>
+                        <div class="stat-info"><h3 id="stat-blogs">...</h3><span>Blog Posts</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="view-materials" class="view-section">
+                <div class="action-bar">
+                    <div class="search-wrapper">
+                        <i class="ph ph-magnifying-glass"></i>
+                        <input type="text" id="material-search" placeholder="Search by course code..." onkeyup="filterMaterials()">
+                    </div>
+                    <button class="btn-primary" onclick="openModal('modal-upload')">
+                        <i class="ph ph-upload-simple"></i> Upload Material
+                    </button>
+                </div>
+
+                <div class="card table-card">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>File Name</th>
+                                <th>Code</th>
+                                <th>Category</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="materials-table-body">
+                            <tr><td colspan="5" style="text-align:center;">Loading materials...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="view-blogs" class="view-section">
+                <div class="action-bar">
+                    <div class="search-wrapper"></div>
+                    <button class="btn-primary" onclick="openModal('modal-blog')">
+                        <i class="ph ph-pen-nib"></i> Write New Post
+                    </button>
+                </div>
+
+                <div class="blog-grid" id="blog-grid">
+                    <p>Loading posts...</p>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <div id="modal-upload" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3>Upload Material</h3>
+                <button class="close-btn" onclick="closeModal('modal-upload')"><i class="ph ph-x"></i></button>
+            </div>
+            
+            <div class="modal-body">
+                <div id="upload-status" style="display:none; padding:10px; margin-bottom:15px; border-radius:6px; font-size:0.9rem; font-weight:600; text-align:center;"></div>
+
+                <div class="form-group">
+                    <label>Select PDF File</label>
+                    <input type="file" id="file-upload" accept=".pdf">
+                </div>
+
+                <div class="form-group">
+                    <label>Title</label>
+                    <input type="text" id="m-title" placeholder="e.g. Engineering Mathematics 1">
+                </div>
+
+                <div class="row">
+                    <div class="form-group">
+                        <label>Course Code</label>
+                        <input type="text" id="m-code" placeholder="e.g. MTS 101">
+                    </div>
+                    <div class="form-group">
+                        <label>School</label>
+                        <select id="m-school">
+                            <option>SEET</option><option>SAAT</option><option>SOS</option>
+                            <option>SET</option><option>SOC</option><option>SEMS</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="form-group">
+                        <label>Level</label>
+                        <select id="m-level">
+                            <option>100</option><option>200</option><option>300</option>
+                            <option>400</option><option>500</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Semester</label>
+                        <select id="m-sem">
+                            <option>1st</option><option>2nd</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Category</label>
+                    <select id="m-category">
+                        <option>Handout</option><option>Past Question</option>
+                    </select>
+                </div>
+
+                <button class="btn-primary full-width" onclick="uploadAndSaveMaterial()">Start Upload</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-blog" class="modal-overlay">
+        <div class="modal-box large">
+            <div class="modal-header">
+                <h3 id="blog-modal-title">Write New Post</h3>
+                <button class="close-btn" onclick="closeModal('modal-blog')"><i class="ph ph-x"></i></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="b-id">
+
+                <div class="form-group">
+                    <label>Title</label>
+                    <input type="text" id="b-title" placeholder="Article Headline">
+                </div>
+                <div class="form-group">
+                    <label>Cover Image URL (Unsplash)</label>
+                    <input type="text" id="b-image" placeholder="https://images.unsplash.com/...">
+                </div>
+                <div class="form-group">
+                    <label>Category</label>
+                    <select id="b-category"><option>News</option><option>Study Tip</option><option>Update</option></select>
+                </div>
+                <div class="form-group">
+                    <label>Content</label>
+                    <textarea id="b-content" rows="8" placeholder="Type your story..."></textarea>
+                </div>
+                
+                <div style="display:flex; gap:10px; margin-top:20px;">
+                    <button class="btn-primary full-width" id="btn-save-blog" onclick="saveBlog()">Publish Post</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
